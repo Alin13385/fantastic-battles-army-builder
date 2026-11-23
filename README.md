@@ -26,8 +26,13 @@ Then open `http://localhost:8000` in your browser.
 
 ## Hosting Online
 
-This is a 100% static web application (HTML, CSS, JS, SVG) with no backend or build step required. Deploy only the web application files (`index.html`, `styles.css`, `app.js`, `data.js`, `engine.js`, `battle.js`, `compare.js`, `icons.js`, `favicon.svg`) to any static host such as **Netlify**, **GitHub Pages**, **Cloudflare Pages**, or **Vercel**.
+This is a 100% static web application (HTML, CSS, JS, SVG) with no backend or build step required. Deploy the web application files (`index.html`, `styles.css`, `app.js`, `data.js`, `engine.js`, `battle.js`, `compare.js`, `icons.js`, `favicon.svg`, `manifest.webmanifest`, `sw.js`) to any static host such as **Cloudflare Pages**, **GitHub Pages**, **Vercel**, or **Netlify**.
+
+## Credits & Official Rules
+
+- **Fantastic Battles** ruleset created by **Nic Wright** ([Irregular Wars](https://irregularwars.com)) — purchase the official rulebook and download official supplements at [irregularwars.com/pages/downloads](https://irregularwars.com/pages/downloads).
+- Inspired by **Mike Wilson's** community Excel Army Builder spreadsheet available on the Irregular Wars downloads page.
 
 ---
 
-*Disclaimer: This is an unofficial fan-made companion tool for Fantastic Battles. All included faction templates use generic fantasy and historical archetypes.*
+*Disclaimer: This is a free, non-commercial, unofficial fan-made companion tool for Fantastic Battles. All included faction templates use generic fantasy and historical archetypes.*
