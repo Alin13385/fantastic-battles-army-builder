@@ -15,7 +15,7 @@ import {
   SPELL_MAP,
   INCOMPATIBILITY_MAP,
   PRESET_ARMIES
-} from './data.js?v=3';
+} from './data.js?v=4';
 
 import {
   generateId,
@@ -28,7 +28,7 @@ import {
   exportArmyText,
   encodeArmyToShareHash,
   decodeArmyFromShareHash
-} from './engine.js?v=3';
+} from './engine.js?v=4';
 
 import {
   renderBattleModeHtml,
@@ -36,16 +36,16 @@ import {
   renderPregameModalHtml,
   handlePregameAction,
   buildPrintCardsHtml
-} from './battle.js?v=3';
+} from './battle.js?v=4';
 
 import {
   UNIT_ICONS,
   UNIT_ICON_MAP,
   detectUnitIconId,
   renderUnitIconHtml
-} from './icons.js?v=3';
+} from './icons.js?v=4';
 
-import { renderComparisonHtml } from './compare.js?v=3';
+import { renderComparisonHtml } from './compare.js?v=4';
 
 const STORAGE_KEY = 'fb_army_builder_v1';
 const CUSTOM_PRESETS_KEY = 'fb_custom_presets_v1';
@@ -908,6 +908,7 @@ function openUnitEditor(unitId = null) {
     };
     document.getElementById('drawerTitle').textContent = 'Edit Unit';
     document.getElementById('btnSaveAndAddAnother').style.display = 'none';
+    document.getElementById('btnDeleteUnitInEditor').style.display = 'inline-flex';
   } else {
     state.editor.editingUnitId = null;
     state.editor.draft = {
@@ -926,6 +927,7 @@ function openUnitEditor(unitId = null) {
     };
     document.getElementById('drawerTitle').textContent = 'Forge New Unit';
     document.getElementById('btnSaveAndAddAnother').style.display = 'inline-flex';
+    document.getElementById('btnDeleteUnitInEditor').style.display = 'none';
   }
 
   state.editor.focusedSlot = state.editor.draft.racial ? 1 : 0;
@@ -1771,12 +1773,23 @@ function renderCompareModal() {
 
   const entryA = items.find(x => x.key === state.compare.idA);
   const entryB = items.find(x => x.key === state.compare.idB);
-  document.getElementById('compareContent').innerHTML = renderComparisonHtml(entryA?.army, entryB?.army);
+  const sameHintHtml = (entryA && entryB && entryA.key === entryB.key)
+    ? `<div class="cmp-same-hint">
+        <span>${items.length <= 1
+          ? 'Tip: Load a second faction preset or save another army to compare a real matchup.'
+          : 'Tip: Both sides are set to the same army — choose a different opponent in Army B above.'}</span>
+        ${items.length <= 1 ? '<button type="button" class="btn btn-sm btn-primary" data-action="compare-open-presets">Browse Faction Presets</button>' : ''}
+      </div>`
+    : '';
+  document.getElementById('compareContent').innerHTML = sameHintHtml + renderComparisonHtml(entryA?.army, entryB?.army);
 }
 
 function openCompareModal() {
   const cur = getCurrentArmy();
   if (cur) state.compare.idA = `army:${cur.id}`;
+  if (state.compare.idB === state.compare.idA) {
+    state.compare.idB = null;
+  }
   renderCompareModal();
   openOverlay('compareModalOverlay');
 }
@@ -2276,6 +2289,25 @@ function bindEvents() {
   document.getElementById('btnSaveUnit').addEventListener('click', () => commitUnitDraft(false));
   document.getElementById('btnSaveAndAddAnother').addEventListener('click', () => commitUnitDraft(true));
 
+  document.getElementById('btnDeleteUnitInEditor').addEventListener('click', () => {
+    const army = getCurrentArmy();
+    const uid = state.editor.editingUnitId;
+    if (!army || !uid) return;
+    const target = army.units.find(x => x.id === uid);
+    if (!target) return;
+    pushUndoSnapshot();
+    army.units = army.units.filter(x => x.id !== uid);
+    for (const other of army.units) {
+      if (other.attachedTo === uid) other.attachedTo = '';
+    }
+    state.editor.open = false;
+    state.editor.draft = null;
+    closeOverlay('unitDrawerOverlay');
+    saveState();
+    renderAll();
+    showToast(`Deleted "${target.name || target.company}"`);
+  });
+
   document.getElementById('editUnitName').addEventListener('input', e => {
     if (!state.editor.draft) return;
     state.editor.draft.name = e.target.value;
@@ -2615,6 +2647,13 @@ function bindEvents() {
   document.getElementById('btnCompareSwap').addEventListener('click', () => {
     [state.compare.idA, state.compare.idB] = [state.compare.idB, state.compare.idA];
     renderCompareModal();
+  });
+
+  document.getElementById('compareContent').addEventListener('click', e => {
+    if (e.target.closest('button[data-action="compare-open-presets"]')) {
+      closeOverlay('compareModalOverlay');
+      openTemplatesModal();
+    }
   });
 
   // Pre-Game Modal

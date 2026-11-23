@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=3" />
+  <link rel="stylesheet" href="styles.css?v=4" />
 </head>
 <body>
   <div class="app-shell">
@@ -468,7 +468,10 @@
       </div>
 
       <div class="drawer-footer">
-        <button id="btnCancelUnit" class="btn">Cancel</button>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <button id="btnCancelUnit" class="btn">Cancel</button>
+          <button id="btnDeleteUnitInEditor" type="button" class="btn btn-danger-ghost" style="display:none;">Delete</button>
+        </div>
         <div style="display:flex; gap:8px;">
           <button id="btnSaveAndAddAnother" class="btn" style="display:none;">Save &amp; Add Another</button>
           <button id="btnSaveUnit" class="btn btn-primary">Save Unit</button>
@@ -772,6 +775,6 @@
   <!-- Toast Notification -->
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script type="module" src="app.js?v=3"></script>
+  <script type="module" src="app.js?v=4"></script>
 </body>
 </html>
