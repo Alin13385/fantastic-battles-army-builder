@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fantastic Battles — Online Army Builder</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top Navigation -->
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="brand-crest emblem-crest" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g stroke="#e8e8e2" stroke-width="3.2" stroke-linecap="round">
+                <line x1="12" y1="12" x2="52" y2="52"/>
+                <line x1="52" y1="12" x2="12" y2="52"/>
+              </g>
+              <g stroke="#decb01" stroke-width="3.4" stroke-linecap="round">
+                <line x1="10" y1="45" x2="19" y2="54"/>
+                <line x1="54" y1="45" x2="45" y2="54"/>
+              </g>
+              <path d="M32 10L49 17V31C49 42 41.8 50.2 32 54C22.2 50.2 15 42 15 31V17L32 10Z" fill="#333333" stroke="#decb01" stroke-width="3" stroke-linejoin="round"/>
+              <path d="M32 14L45 19.5V30.8C45 39.6 39.4 46.4 32 49.6C24.6 46.4 19 39.6 19 30.8V19.5L32 14Z" fill="#252524"/>
+              <line x1="32" y1="14.5" x2="32" y2="49" stroke="#decb01" stroke-width="1.5" stroke-opacity="0.45"/>
+              <line x1="19.5" y1="29.5" x2="44.5" y2="29.5" stroke="#decb01" stroke-width="1.5" stroke-opacity="0.45"/>
+              <polygon points="32,21 38,29.5 32,38 26,29.5" fill="#00bd18" stroke="#fefefe" stroke-width="1.5" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="brand-title">Fantastic Battles</div>
+            <div class="brand-sub">Army Builder &amp; Battle Companion</div>
+          </div>
+        </div>
+
+        <div class="topbar-center">
+          <div class="army-switcher" title="Switch saved army">
+            <select id="armySelect" aria-label="Select saved army"></select>
+            <button id="btnNewArmy" class="btn btn-sm btn-ghost" title="Create blank army">+ New</button>
+            <button id="btnDeleteArmy" class="btn btn-sm btn-danger-ghost" title="Delete current army">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/>
+              </svg>
+            </button>
+          </div>
+          <button id="btnSaveArmy" class="btn btn-sm btn-primary" title="Save current army or manage saved armies">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+            </svg>
+            Save Army
+          </button>
+          <button id="btnTemplates" class="btn btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+            </svg>
+            Faction Presets
+          </button>
+        </div>
+
+        <div class="topbar-actions">
+          <button id="btnCompare" class="btn btn-sm" title="Compare two armies side-by-side">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v18"/><path d="M5 7h14"/><path d="M5 7l-2 6h4l-2-6z"/><path d="M19 7l-2 6h4l-2-6z"/><path d="M8 21h8"/>
+            </svg>
+            Compare
+          </button>
+          <button id="btnCompendium" class="btn btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+            </svg>
+            Rules Ref
+          </button>
+          <button id="btnPrint" class="btn btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
+            </svg>
+            Print Sheet
+          </button>
+          <button id="btnShare" class="btn btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+            Share / Export
+          </button>
+          <button id="btnTheme" class="btn btn-icon btn-ghost" title="Toggle light/dark theme" aria-label="Toggle theme">
+            <svg id="themeIconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+              <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+            <svg id="themeIconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Army Summary & Composition Command Bar -->
+    <section class="command-bar">
+      <div class="command-bar-inner">
+        <div class="command-top">
+          <div class="army-identity">
+            <input id="armyNameInput" class="army-name-input" type="text" placeholder="Army Name..." aria-label="Army name" />
+
+            <label class="inline-setting" title="Target battle points size">
+              <span>Limit:</span>
+              <select id="pointsLimitSelect" aria-label="Points limit">
+                <option value="250">250 pts</option>
+                <option value="500" selected>500 pts</option>
+                <option value="750">750 pts</option>
+                <option value="1000">1000 pts</option>
+                <option value="1500">1500 pts</option>
+                <option value="0">Unlimited</option>
+                <option value="custom">Custom…</option>
+              </select>
+              <input id="customPointsInput" type="number" min="50" step="50" style="display:none;" aria-label="Custom points limit" />
+            </label>
+
+            <label class="inline-setting" title="Optional default racial trait pre-filled for new companies">
+              <span>Racial:</span>
+              <select id="defaultRacialSelect" aria-label="Default racial trait"></select>
+            </label>
+
+            <div id="bannerColorPicker" class="banner-picker" title="Army banner accent color"></div>
+          </div>
+
+          <div class="kpi-strip">
+            <div id="kpiPointsBox" class="kpi-box kpi-points">
+              <span class="kpi-label">Total Points</span>
+              <div class="kpi-value" id="kpiPointsVal">0 / 500</div>
+              <div class="points-bar-track">
+                <div id="pointsBarFill" class="points-bar-fill" style="width: 0%;"></div>
+              </div>
+            </div>
+            <div class="kpi-box" title="Starting companies counted toward Break Point (excludes Characters, Expendable &amp; Swarm)">
+              <span class="kpi-label">Companies</span>
+              <div class="kpi-value" id="kpiCompaniesVal">0</div>
+              <span class="kpi-sub" id="kpiCompaniesSub">0 total bases</span>
+            </div>
+            <div class="kpi-box" title="Army breaks when more than half of starting companies scatter">
+              <span class="kpi-label">Break Point</span>
+              <div class="kpi-value" id="kpiBreakPointVal">0</div>
+              <span class="kpi-sub">scattered</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="command-bottom">
+          <div id="limitPills" class="limit-pills"></div>
+          <div id="armyStatusBadge" class="status-badge valid">Ready</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main 2-Column Workspace -->
+    <main class="workspace">
+      <!-- Left: Unit Roster -->
+      <section class="roster-column">
+        <div class="roster-toolbar">
+          <div class="toolbar-left">
+            <div class="segmented mode-switcher" role="tablist" aria-label="App mode">
+              <button id="modeBuild" class="active" type="button">Build</button>
+              <button id="modeBattle" type="button">⚔ Battle Mode</button>
+            </div>
+            <div id="buildOnlyFilters" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <div class="segmented" role="tablist" aria-label="Unit filter">
+                <button id="filterAll" class="active" type="button">All <span id="countAll"></span></button>
+                <button id="filterActive" type="button">Active <span id="countActive"></span></button>
+              </div>
+              <div class="search-wrap">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input id="rosterSearch" class="input" type="search" placeholder="Filter units or traits..." aria-label="Filter units" />
+              </div>
+            </div>
+          </div>
+
+          <div class="toolbar-right">
+            <div id="undoRedoGroup" class="reorder-btns" style="margin-right:2px;">
+              <button id="btnUndo" type="button" class="btn btn-sm btn-ghost btn-reorder" title="Undo (Ctrl+Z)" aria-label="Undo" disabled>↶</button>
+              <button id="btnRedo" type="button" class="btn btn-sm btn-ghost btn-reorder" title="Redo (Ctrl+Y)" aria-label="Redo" disabled>↷</button>
+            </div>
+            <button id="btnPregame" class="btn btn-sm" title="Roll Attacker/Defender, Mishaps, Stimulants &amp; Prophesy">🎲 Pre-Game</button>
+            <button id="btnResetBases" class="btn btn-sm btn-ghost" title="Set all unit base counts to 0 (keeps your faction catalog)">
+              Clear Bases
+            </button>
+            <button id="btnAddUnit" class="btn btn-primary">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Add Unit
+            </button>
+          </div>
+        </div>
+
+        <div id="rosterContainer"></div>
+      </section>
+
+      <!-- Right: Tactical Sidebar -->
+      <aside class="sidebar">
+        <!-- Strategies Panel -->
+        <section class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Strategies</h3>
+            <span id="strategyBadge" class="panel-badge">0 / 3 &middot; 0 pts</span>
+          </div>
+          <div class="panel-body">
+            <div id="strategyList" class="strategy-grid"></div>
+          </div>
+        </section>
+
+        <!-- Army Breakdown & Validation -->
+        <section class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Army Breakdown</h3>
+            <span id="breakdownTotalBadge" class="panel-badge">0 pts</span>
+          </div>
+          <div class="panel-body">
+            <div id="breakdownContent" class="breakdown-rows"></div>
+            <div id="validationAlerts" class="alert-list"></div>
+          </div>
+        </section>
+
+        <!-- Tactical Profile Analytics -->
+        <section class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Tactical Profile</h3>
+            <span class="panel-badge">Active Force</span>
+          </div>
+          <div class="panel-body">
+            <div id="tacticalProfileContent" class="tactical-grid"></div>
+          </div>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <!-- ======================================================================
+       Slide-Over Drawer: Unit Forge / Editor
+       ====================================================================== -->
+  <div id="unitDrawerOverlay" class="overlay" aria-hidden="true">
+    <div class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+      <div class="drawer-header">
+        <h2 id="drawerTitle">Forge Unit</h2>
+        <button id="btnCloseDrawer" class="btn btn-icon btn-ghost" aria-label="Close unit editor">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        <!-- Live Unit Preview -->
+        <div id="editorPreview" class="preview-card"></div>
+
+        <!-- Name & Bases -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="editUnitName">Unit Name</label>
+            <input id="editUnitName" class="input" type="text" placeholder="e.g. Temple Guard, Warlord..." />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editUnitBases"># Bases</label>
+            <input id="editUnitBases" class="input" type="number" min="0" max="99" value="1" />
+          </div>
+        </div>
+
+        <!-- Unit Type Icon Picker -->
+        <div class="form-group">
+          <div class="form-label">
+            <span>Unit Type Icon</span>
+            <span id="iconPickerHint" class="form-hint">Auto-detected from profile &amp; traits</span>
+          </div>
+          <div id="iconPickerStrip" class="icon-picker-strip"></div>
+        </div>
+
+        <!-- Base Company / Character Profile Picker -->
+        <div class="form-group">
+          <div class="form-label">
+            <span>Base Profile</span>
+            <span class="form-hint">Choose a Company or Standalone Character</span>
+          </div>
+          <div id="profilePicker"></div>
+        </div>
+
+        <!-- Traits Section (hidden/disabled for standalone characters) -->
+        <div id="editorTraitsSection" class="form-group">
+          <div class="form-label">
+            <span>Traits (up to 4: 1 Racial + 3 Traits)</span>
+            <span class="form-hint">Click a slot, then pick below</span>
+          </div>
+          <div id="traitSlots" class="trait-slots"></div>
+          <div id="traitPickerPanel" class="trait-picker-panel">
+            <input id="traitSearchInput" class="input" type="search" placeholder="Search 53 traits by name or effect..." />
+            <div id="traitPickerList" class="trait-picker-list"></div>
+          </div>
+        </div>
+
+        <!-- Relic Section -->
+        <div id="editorRelicSection" class="form-group">
+          <div class="form-label">
+            <span>Relic</span>
+            <span id="relicHint" class="form-hint">Available for Characters &amp; Character-companies</span>
+          </div>
+          <select id="editUnitRelic" class="select"></select>
+          <div id="relicDescriptionBox" style="font-size:12px; color:var(--text-secondary);"></div>
+        </div>
+
+        <!-- Spellbook Section (Mages only) -->
+        <div id="editorSpellsSection" class="form-group" style="display:none;">
+          <div class="form-label">
+            <span>Spellbook</span>
+            <span id="spellBudgetHint" class="form-hint">0 / 3 spell levels used</span>
+          </div>
+          <div id="spellPickerList" class="spell-picker-grid"></div>
+        </div>
+
+        <!-- Character Attachment (Standalone Characters only) -->
+        <div id="editorAttachSection" class="form-group" style="display:none;">
+          <div class="form-label">
+            <span>Attached to Company (optional)</span>
+            <span class="form-hint">Plan deployment attachment</span>
+          </div>
+          <select id="editUnitAttach" class="select"></select>
+        </div>
+
+        <!-- Unit Notes -->
+        <div class="form-group">
+          <label class="form-label" for="editUnitNotes">
+            <span>Unit Notes (optional)</span>
+            <span class="form-hint">Base size, model count, or tabletop reminder</span>
+          </label>
+          <input id="editUnitNotes" class="input" type="text" placeholder="e.g. 40×20mm bases · holds center flank" />
+        </div>
+      </div>
+
+      <div class="drawer-footer">
+        <button id="btnCancelUnit" class="btn">Cancel</button>
+        <div style="display:flex; gap:8px;">
+          <button id="btnSaveAndAddAnother" class="btn" style="display:none;">Save &amp; Add Another</button>
+          <button id="btnSaveUnit" class="btn btn-primary">Save Unit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       Modal: Save Army & Saved Armies Library
+       ====================================================================== -->
+  <div id="savedArmiesModalOverlay" class="overlay center" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="savedArmiesModalTitle">
+      <div class="modal-header">
+        <h2 id="savedArmiesModalTitle">Save &amp; Manage Armies</h2>
+        <button class="btn btn-icon btn-ghost" data-close-modal="savedArmiesModalOverlay" aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="save-box">
+          <div class="save-box-head">
+            <strong>Current Army</strong>
+            <span id="saveBoxSummary" class="panel-badge"></span>
+          </div>
+          <div class="save-form-grid">
+            <div class="form-group">
+              <label class="form-label" for="saveArmyNameInput">Army Name</label>
+              <input id="saveArmyNameInput" class="input" type="text" placeholder="e.g. My 500pt Dwarven Hold" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="saveArmyTaglineInput">Notes / Tagline (optional)</label>
+              <input id="saveArmyTaglineInput" class="input" type="text" placeholder="e.g. Tournament list, heavy cavalry..." />
+            </div>
+          </div>
+          <div class="save-actions-row">
+            <button id="btnQuickSaveCurrent" type="button" class="btn btn-primary">Save Changes</button>
+            <button id="btnSaveAsCopy" type="button" class="btn">Save as New Copy</button>
+            <button id="btnSaveAsPreset" type="button" class="btn">Save to Faction Presets</button>
+          </div>
+          <label class="save-preset-opt">
+            <input id="chkPresetKeepBases" type="checkbox" checked />
+            <span>When saving to Faction Presets, keep current <strong># Bases</strong> &amp; <strong>Strategies</strong> (uncheck to save as a 0-base catalog)</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">
+            <span>Saved Armies in Builder <span id="savedArmiesCount"></span></span>
+            <span class="form-hint">Stored locally in your browser</span>
+          </div>
+          <div id="savedArmiesGrid" class="template-grid"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btnSaveModalNewBlank" type="button" class="btn btn-sm">+ New Blank Army</button>
+        <button class="btn" data-close-modal="savedArmiesModalOverlay">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       Modal: Faction Presets / Templates
+       ====================================================================== -->
+  <div id="templatesModalOverlay" class="overlay center" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="templatesModalTitle">
+      <div class="modal-header">
+        <h2 id="templatesModalTitle">Faction Army Presets</h2>
+        <button class="btn btn-icon btn-ghost" data-close-modal="templatesModalOverlay" aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="margin:0; color:var(--text-secondary); font-size:13px;">
+          Load any fantasy or historical faction catalog as a new saved army. Units start at 0 bases so you can click <strong>+</strong> to dial up your exact battle roster, or edit any unit freely.
+        </p>
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+          <div class="tabs" id="templatesTabs" style="border-bottom:none; padding-bottom:0;">
+            <button class="tab-btn active" data-template-tab="all">All <span id="tplCountAll"></span></button>
+            <button class="tab-btn" data-template-tab="custom">My Presets <span id="tplCountCustom"></span></button>
+            <button class="tab-btn" data-template-tab="fantasy">Fantasy <span id="tplCountFantasy"></span></button>
+            <button class="tab-btn" data-template-tab="historical">Historical <span id="tplCountHistorical"></span></button>
+          </div>
+          <input id="templatesSearch" class="input" type="search" placeholder="Search factions or units..." style="width:220px;" />
+        </div>
+        <div id="templatesGrid" class="template-grid"></div>
+      </div>
+      <div class="modal-footer">
+        <span style="font-size:12px; color:var(--text-muted);">38 generic fantasy &amp; historical army templates &middot; Unofficial fan-made companion</span>
+        <button class="btn" data-close-modal="templatesModalOverlay">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       Modal: Rules Compendium
+       ====================================================================== -->
+  <div id="compendiumModalOverlay" class="overlay center" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="compendiumModalTitle">
+      <div class="modal-header">
+        <h2 id="compendiumModalTitle">Fantastic Battles Rules Reference</h2>
+        <button class="btn btn-icon btn-ghost" data-close-modal="compendiumModalOverlay" aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+          <div class="tabs" id="compendiumTabs">
+            <button class="tab-btn active" data-tab="traits">Traits (53)</button>
+            <button class="tab-btn" data-tab="profiles">Base Profiles (12)</button>
+            <button class="tab-btn" data-tab="relics">Relics (14)</button>
+            <button class="tab-btn" data-tab="strategies">Strategies (8)</button>
+            <button class="tab-btn" data-tab="spells">Spells (10)</button>
+          </div>
+          <input id="compendiumSearch" class="input" type="search" placeholder="Search rules..." style="width:220px;" />
+        </div>
+        <div id="compendiumContent" class="ref-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       Modal: Quick Rule Detail Popover
+       ====================================================================== -->
+  <div id="ruleModalOverlay" class="overlay center" aria-hidden="true">
+    <div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="ruleModalTitle">
+      <div class="modal-header">
+        <h2 id="ruleModalTitle">Rule Detail</h2>
+        <button class="btn btn-icon btn-ghost" data-close-modal="ruleModalOverlay" aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div id="ruleModalBody" class="modal-body"></div>
+      <div class="modal-footer">
+        <span></span>
+        <button class="btn btn-primary" data-close-modal="ruleModalOverlay">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       Modal: Print Preview
+       ====================================================================== -->
+  <div id="printModalOverlay" class="overlay center print-preview-modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="printModalTitle">
+      <div class="modal-header">
+        <h2 id="printModalTitle">Printable Battle Sheet</h2>
+        <button class="btn btn-icon btn-ghost" data-close-modal="printModalOverlay" aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+          <div class="segmented" role="tablist" aria-label="Print layout">
+            <button id="printModeTable" class="active" type="button">Roster Table</button>
+            <button id="printModeCards" type="button">Unit Stat Cards</button>
+          </div>
+          <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+            <label id="lblPrintAppendix" style="display:inline-flex; align-items:center; gap:7px; font-size:13px; cursor:pointer;">
+              <input id="chkPrintAppendix" type="checkbox" checked />
+              Include rules appendix
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:7px; font-size:13px; cursor:pointer;">
+              <input id="chkPrintZeroBases" type="checkbox" />
+              Include 0-base units
+            </label>
+          </div>
+        </div>
+        <div id="printPreviewBox" class="print-sheet-preview"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-close-modal="printModalOverlay">Close</button>
+        <button id="btnDoPrint" class="btn btn-primary">Print / Save as PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       Modal: Share / Export / Import
+       ====================================================================== -->
+  <div id="shareModalOverlay" class="overlay center" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
+      <div class="modal-header">
+        <h2 id="shareModalTitle">Share, Export &amp; Import Army</h2>
+        <button class="btn btn-icon btn-ghost" data-close-modal="shareModalOverlay" aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <div class="form-label">
+            <span>Shareable Online Link</span>
+            <span class="form-hint">Encodes your full army directly into the URL</span>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <input id="shareUrlInput" class="input" type="text" readonly style="flex:1; font-family:var(--font-mono); font-size:12px;" />
+            <button id="btnCopyShareUrl" class="btn btn-primary">Copy Link</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">
+            <span>Plain-Text Roster (for Discord, Email, Forums)</span>
+            <button id="btnCopyText" class="btn btn-sm">Copy Text</button>
+          </div>
+          <textarea id="exportTextArea" class="export-textarea" readonly></textarea>
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">
+            <span>Backup &amp; Restore (JSON)</span>
+            <span class="form-hint">Single army or full saved library</span>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button id="btnDownloadJson" class="btn">Export Current Army (.json)</button>
+            <button id="btnDownloadLibraryJson" class="btn">Export Full Library (.json)</button>
+            <label class="btn" style="cursor:pointer;">
+              Import Army / Library (.json)
+              <input id="importJsonInput" type="file" accept=".json,application/json" style="display:none;" />
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <span></span>
+        <button class="btn" data-close-modal="shareModalOverlay">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       Modal: Pre-Game Roll Helper
+       ====================================================================== -->
+  <div id="pregameModalOverlay" class="overlay center" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pregameModalTitle">
+      <div class="modal-header">
+        <h2 id="pregameModalTitle">Pre-Game Rolls &amp; Setup</h2>
+        <button class="btn btn-icon btn-ghost" data-close-modal="pregameModalOverlay" aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div id="pregameModalBody" class="modal-body"></div>
+      <div class="modal-footer">
+        <span style="font-size:12px; color:var(--text-muted);">Automatically applies Scouts, Quartermaster, Reliable, Unreliable, Impulsive, Stimulants &amp; Prophesy</span>
+        <button class="btn btn-primary" data-close-modal="pregameModalOverlay">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       Modal: Side-by-Side Army Comparison (Matchup Balance View)
+       ====================================================================== -->
+  <div id="compareModalOverlay" class="overlay center" aria-hidden="true">
+    <div class="modal modal-lg" role="dialog" aria-modal="true" aria-labelledby="compareModalTitle">
+      <div class="modal-header">
+        <h2 id="compareModalTitle">Army Matchup Comparison</h2>
+        <button class="btn btn-icon btn-ghost" data-close-modal="compareModalOverlay" aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="cmp-picker-bar">
+          <div class="form-group" style="flex:1; min-width:190px;">
+            <label class="form-label" for="compareSelectA">Army A (Left)</label>
+            <select id="compareSelectA" class="select"></select>
+          </div>
+          <button id="btnCompareSwap" type="button" class="btn btn-sm" title="Swap Army A and Army B" style="align-self:flex-end; height:36px;">⇄ Swap</button>
+          <div class="form-group" style="flex:1; min-width:190px;">
+            <label class="form-label" for="compareSelectB">Army B (Right)</label>
+            <select id="compareSelectB" class="select"></select>
+          </div>
+        </div>
+        <div id="compareContent"></div>
+      </div>
+      <div class="modal-footer">
+        <span style="font-size:12px; color:var(--text-muted);">Compares active units (# Bases &gt; 0), strategies, relics &amp; spells</span>
+        <button class="btn btn-primary" data-close-modal="compareModalOverlay">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Native Print Area -->
+  <div id="printSheet" class="print-sheet"></div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
