@@ -129,7 +129,7 @@ function renderRosterColumn(m, sideLabel) {
       <div class="cmp-unit-left">
         ${renderUnitIconHtml(unit, calc)}
         <div style="min-width:0;">
-          <div class="cmp-unit-name">${escapeHtml(unit.name || calc.profile.name)}${calc.bases > 1 ? ` <span class="cmp-qty">×${calc.bases}</span>` : ''}</div>
+          <div class="cmp-unit-name">${escapeHtml(unit.name || calc.profile.name)}${calc.bases > 1 ? ` <span class="cmp-qty">×${calc.bases}</span>` : ''}${calc.isHorde ? ` <span class="cmp-horde-tag">Horde ${escapeHtml(calc.hordeFormation)}</span>` : ''}</div>
           <div class="cmp-unit-meta">R:${calc.res} M:${calc.mov} Ml:${calc.mel} S:${formatShooting(calc.shtShort, calc.shtLong)} D:${formatDefence(calc.def)}${calc.com ? ` C:${calc.com}` : ''}</div>
         </div>
       </div>

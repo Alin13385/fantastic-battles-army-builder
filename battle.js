@@ -274,9 +274,10 @@ export function renderBattleModeHtml(army) {
           ` : ''}
         </div>
 
-        ${(calc.traits.length || calc.relic || calc.spells.length) ? `
+        ${(calc.traits.length || calc.isHorde || calc.relic || calc.spells.length) ? `
           <div class="pill-row" style="margin-top:4px;">
             ${calc.traits.map(tid => `<button type="button" class="rule-pill" data-rule-type="trait" data-rule-id="${escapeHtml(tid)}">${escapeHtml(tid)}</button>`).join('')}
+            ${calc.isHorde ? `<button type="button" class="rule-pill pill-horde" data-rule-type="horde" data-rule-id="Horde"><span class="pill-tag">Horde</span><span>${escapeHtml(calc.hordeFormation)}</span></button>` : ''}
             ${calc.relic ? `<button type="button" class="rule-pill pill-relic" data-rule-type="relic" data-rule-id="${escapeHtml(calc.relic.id)}">Relic: ${escapeHtml(calc.relic.name)}</button>` : ''}
             ${calc.spells.map(sp => `<button type="button" class="rule-pill pill-spell" data-rule-type="spell" data-rule-id="${escapeHtml(sp.id)}">${escapeHtml(sp.id)} L${sp.level}</button>`).join('')}
           </div>
@@ -604,6 +605,9 @@ export function buildPrintCardsHtml(army, includeZeroBases = false) {
     for (const tid of calc.traits) {
       const t = TRAIT_MAP[tid];
       if (t) ruleSnippets.push(`<strong>${escapeHtml(t.name)}</strong>`);
+    }
+    if (calc.isHorde) {
+      ruleSnippets.push(`<strong>Horde (${escapeHtml(calc.hordeFormation)}):</strong> +1 front Mel &amp; charge, +1 Sht (applied)`);
     }
     if (calc.relic) {
       ruleSnippets.push(`<strong>Relic — ${escapeHtml(calc.relic.name)}:</strong> ${escapeHtml(calc.relic.description)}`);

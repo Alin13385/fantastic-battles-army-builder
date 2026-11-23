@@ -382,7 +382,7 @@ export const TRAITS = [
     cost: 0,
     mods: { mel: -1 },
     incompatible: ['Reliable', 'Unreliable', 'Proud'],
-    description: 'Undead hordes, golems, elementals and automatons. Mindless units suffer -1 to Melee (spreadsheet profile; rules text also notes -1 Move). They do not suffer Resolve loss when friendly units scatter and default to "Let’s not be too hasty…" if impetuous. Only a Mage-lord may rally mindless units (or a Bless spell). If the Warlord/Mage-lord is killed or scatters, all mindless units suffer an immediate -5 Resolve.'
+    description: 'Undead hordes, golems, elementals and automatons. Mindless units suffer -1 to Melee (v1.2: no movement penalty). They do not suffer Resolve loss when friendly units scatter and default to "Let’s not be too hasty…" if impetuous. Only a Mage-lord may rally mindless units (or a Bless spell). If the Warlord/Mage-lord is killed or scatters, all mindless units suffer an immediate -5 Resolve.'
   },
   {
     id: 'Monstrous',
@@ -824,6 +824,19 @@ export const SPELLS = [
     description: 'Adds 1 summoning point per success to the caster’s summoning pool (Lvl 1 = 10 pts/point, Lvl 2 = 20 pts/point, Lvl 3 = 30 pts/point). Spend points to deploy a 1–4 company unit within 2bw (cannot act that turn; contacting an enemy’s front counts as charging).'
   }
 ];
+
+export const HORDE_RULE = {
+  id: 'Horde',
+  name: 'Horde',
+  cost: 0,
+  summary: '+1 front Melee & charge bonus, +1 to existing Shooting',
+  description:
+    'Unique formation allowed only to Irregular Companies of 6 (3×2) or 8 (4×2) bases arranged in a line two companies deep. ' +
+    'Horde units may not change into other formations — they may turn to face their rear or conform with enemies engaged only to a single flank, but must otherwise remain a two-deep horde block. ' +
+    'Resolve stacks like a normal group unit. Companies in the front rank gain +1 additional charge bonus and +1 Melee when fighting to their front. ' +
+    'In addition, Horde companies gain +1 to any existing Shooting factors. ' +
+    'Horde units may interpenetrate (or be interpenetrated by) friendly units under usual conditions, but both units suffer -1 Resolve for every company passed through unless either unit has the Ephemeral, Flying, or Skirmishers traits.'
+};
 
 export const BANNER_COLORS = [
   { id: 'gold', name: 'Royal Gold', hex: '#decb01' },

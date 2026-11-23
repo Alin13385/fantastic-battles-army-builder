@@ -6,6 +6,7 @@ import {
   RELICS,
   STRATEGIES,
   SPELLS,
+  HORDE_RULE,
   BANNER_COLORS,
   PROFILE_MAP,
   TRAIT_MAP,
@@ -59,6 +60,8 @@ const state = {
   customPresets: [],
   currentArmyId: null,
   viewMode: 'build', // 'build' | 'battle'
+  mobileTab: 'roster', // 'roster' | 'battle' | 'tactics'
+  mobileOptionsOpen: false,
   printMode: 'table', // 'table' | 'cards'
   filterMode: 'all', // 'all' | 'active'
   searchQuery: '',
@@ -209,6 +212,7 @@ function createArmyFromPreset(preset, withStarterSelection = false) {
         spells: u.spells ? { ...u.spells } : (withStarterSelection && u.name === 'Mage' ? { Bless: 2, Empower: 1, 'Magic Missiles': 1 } : {}),
         notes: u.notes || '',
         attachedTo: '',
+        horde: Boolean(u.horde),
         bases: start.bases ?? (typeof u.bases === 'number' ? u.bases : 0)
       };
     })
@@ -345,6 +349,8 @@ function applyTheme(theme) {
   localStorage.setItem(THEME_KEY, theme);
   document.getElementById('themeIconSun').style.display = theme === 'dark' ? 'block' : 'none';
   document.getElementById('themeIconMoon').style.display = theme === 'dark' ? 'none' : 'block';
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if (metaTheme) metaTheme.setAttribute('content', theme === 'dark' ? '#252524' : '#fefefe');
 }
 
 // ============================================================================
@@ -360,6 +366,50 @@ function renderAll() {
   renderCommandBar(army, summary);
   renderRoster(army, summary);
   renderSidebar(army, summary);
+  renderMobileChrome(army, summary);
+}
+
+function renderMobileChrome(army, summary) {
+  const workspace = document.querySelector('.workspace');
+  if (workspace) {
+    workspace.setAttribute('data-mobile-tab', state.mobileTab);
+  }
+
+  const cmdBar = document.querySelector('.command-bar');
+  const optBtn = document.getElementById('btnMobileCommandToggle');
+  if (cmdBar && optBtn) {
+    cmdBar.classList.toggle('mobile-options-open', state.mobileOptionsOpen);
+    optBtn.setAttribute('aria-expanded', String(state.mobileOptionsOpen));
+    optBtn.textContent = state.mobileOptionsOpen ? 'Options ▴' : 'Options ▾';
+  }
+
+  const nav = document.getElementById('mobileBottomNav');
+  if (nav) {
+    nav.querySelectorAll('.mobile-nav-btn[data-mobile-tab]').forEach(btn => {
+      const tab = btn.dataset.mobileTab;
+      btn.classList.toggle('active', tab === state.mobileTab);
+    });
+  }
+
+  const badge = document.getElementById('mobileTacticsBadge');
+  if (badge) {
+    const errCount = summary.errors.length;
+    const stratCount = (army.strategies || []).length;
+    if (errCount > 0) {
+      badge.textContent = '!';
+      badge.className = 'mobile-nav-badge danger';
+      badge.style.display = 'inline-flex';
+    } else if (stratCount > 0) {
+      badge.textContent = String(stratCount);
+      badge.className = 'mobile-nav-badge';
+      badge.style.display = 'inline-flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  const mobDel = document.getElementById('btnMobileDeleteArmy');
+  if (mobDel) mobDel.disabled = state.armies.length <= 1;
 }
 
 function renderTopBar(army) {
@@ -403,14 +453,6 @@ function renderCommandBar(army, summary) {
     racialSel.innerHTML = opts.join('');
   }
   racialSel.value = army.defaultRacial || '';
-
-  // Banner accent color picker
-  const activeBanner = BANNER_COLORS.find(c => c.id === army.bannerColor) || BANNER_COLORS[0];
-  document.querySelector('.command-bar').style.setProperty('--banner-accent', activeBanner.hex);
-  const pickerEl = document.getElementById('bannerColorPicker');
-  pickerEl.innerHTML = BANNER_COLORS.map(c => `
-    <button type="button" class="banner-dot ${c.id === activeBanner.id ? 'active' : ''}" style="background:${c.hex};" data-banner-color="${c.id}" title="Banner: ${escapeHtml(c.name)}" aria-label="${escapeHtml(c.name)}"></button>
-  `).join('');
 
   // KPIs
   const kpiPointsBox = document.getElementById('kpiPointsBox');
@@ -477,6 +519,7 @@ function renderCommandBar(army, summary) {
 
 function renderRoster(army, summary) {
   const isBattle = state.viewMode === 'battle';
+  document.querySelector('.roster-toolbar')?.classList.toggle('is-battle-mode', isBattle);
   document.getElementById('modeBuild').classList.toggle('active', !isBattle);
   document.getElementById('modeBattle').classList.toggle('active', isBattle);
   document.getElementById('buildOnlyFilters').style.display = isBattle ? 'none' : 'flex';
@@ -508,6 +551,7 @@ function renderRoster(army, summary) {
       unit.racial,
       ...(unit.traits || []),
       unit.relic,
+      ...(calc.isHorde ? ['horde'] : []),
       ...(calc.spells || []).map(s => s.id),
       unit.notes || ''
     ].join(' ').toLowerCase();
@@ -654,6 +698,14 @@ function renderUnitCard({ unit, calc }, index = 0, totalInSection = 1, unitById 
       `);
     }
   }
+  if (calc.isHorde) {
+    pills.push(`
+      <button type="button" class="rule-pill pill-horde" data-rule-type="horde" data-rule-id="Horde" title="Click for Horde formation rules">
+        <span class="pill-tag">Trait</span>
+        <span>Horde (${escapeHtml(calc.hordeFormation)})</span>
+      </button>
+    `);
+  }
   if (calc.relic) {
     pills.push(`
       <button type="button" class="rule-pill pill-relic" data-rule-type="relic" data-rule-id="${escapeHtml(calc.relic.id)}" title="Click for relic details">
@@ -709,6 +761,13 @@ function renderUnitCard({ unit, calc }, index = 0, totalInSection = 1, unitById 
             <button type="button" data-action="inc-bases" data-unit-id="${escapeHtml(unit.id)}" aria-label="Increase bases">+</button>
           </div>
         </div>
+        ${calc.canFormHorde ? `
+          <div class="unit-horde-row">
+            <button type="button" class="btn btn-sm btn-horde-toggle ${calc.isHorde ? 'active' : ''}" data-action="toggle-horde" data-unit-id="${escapeHtml(unit.id)}" title="${calc.isHorde ? 'Disband Horde formation' : 'Form Irregular bases into a two-deep Horde (+1 front Mel/Charge, +1 Sht)'}">
+              ${calc.isHorde ? `✓ Horde Formed (${escapeHtml(calc.hordeFormation)})` : `+ Form Horde (${escapeHtml(calc.hordeFormation)})`}
+            </button>
+          </div>
+        ` : ''}
         <div class="unit-actions">
           <div class="reorder-btns" aria-label="Reorder unit">
             <button type="button" class="btn btn-sm btn-ghost btn-reorder" data-action="move-unit-up" data-unit-id="${escapeHtml(unit.id)}" ${index <= 0 ? 'disabled' : ''} title="Move unit up" aria-label="Move unit up">
@@ -844,6 +903,7 @@ function openUnitEditor(unitId = null) {
       spells: existing.spells ? { ...existing.spells } : {},
       attachedTo: existing.attachedTo || '',
       notes: existing.notes || '',
+      horde: Boolean(existing.horde),
       bases: existing.bases ?? 1
     };
     document.getElementById('drawerTitle').textContent = 'Edit Unit';
@@ -861,6 +921,7 @@ function openUnitEditor(unitId = null) {
       spells: {},
       attachedTo: '',
       notes: '',
+      horde: false,
       bases: 1
     };
     document.getElementById('drawerTitle').textContent = 'Forge New Unit';
@@ -930,9 +991,29 @@ function renderEditor() {
       </div>
     </div>
     ${renderStatStrip(calc)}
+    ${calc.isHorde ? `<div class="pill-row"><span class="rule-pill pill-horde"><span class="pill-tag">Trait</span><span>Horde (${escapeHtml(calc.hordeFormation)})</span></span></div>` : ''}
     <div class="cost-breakdown-strip">${escapeHtml(breakdownStr)}</div>
     ${calc.unitErrors.length > 0 ? `<div class="alert-item error" style="margin:0;"><span>⚠</span><span>${escapeHtml(calc.unitErrors.join(' · '))}</span></div>` : ''}
   `;
+
+  // 1a. Horde Formation Toggle in Editor
+  const hordeBox = document.getElementById('editorHordeBox');
+  if (calc.canFormHorde) {
+    hordeBox.style.display = 'flex';
+    hordeBox.innerHTML = `
+      <div style="min-width:0;">
+        <div class="horde-editor-title">Horde Formation Eligible (${escapeHtml(calc.hordeFormation)} block)</div>
+        <div class="horde-editor-sub">${escapeHtml(HORDE_RULE.summary)} &middot; Free</div>
+      </div>
+      <button type="button" class="btn btn-sm btn-horde-toggle ${calc.isHorde ? 'active' : ''}" data-action="editor-toggle-horde">
+        ${calc.isHorde ? '✓ Horde Formed' : `+ Form Horde`}
+      </button>
+    `;
+  } else {
+    draft.horde = false;
+    hordeBox.style.display = 'none';
+    hordeBox.innerHTML = '';
+  }
 
   // 1b. Unit Icon Picker
   const detectedId = detectUnitIconId({ ...cleanDraft, icon: '' }, calc);
@@ -1139,6 +1220,7 @@ function commitUnitDraft(addAnother = false) {
     spells: {},
     attachedTo: '',
     notes: (draft.notes || '').trim(),
+    horde: draft.company === 'Irregular company' && (parseInt(draft.bases, 10) === 6 || parseInt(draft.bases, 10) === 8) ? Boolean(draft.horde) : false,
     bases: Math.max(0, parseInt(draft.bases, 10) || 0)
   };
 
@@ -1194,12 +1276,16 @@ function openOverlay(id) {
   const el = document.getElementById(id);
   el.classList.add('open');
   el.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('modal-open');
 }
 
 function closeOverlay(id) {
   const el = document.getElementById(id);
   el.classList.remove('open');
   el.setAttribute('aria-hidden', 'true');
+  if (!document.querySelector('.overlay.open')) {
+    document.body.classList.remove('modal-open');
+  }
 }
 
 function renderSavedArmiesModal() {
@@ -1352,7 +1438,17 @@ function renderCompendium() {
 
   if (tab === 'traits') {
     const items = TRAITS.filter(t => !q || t.name.toLowerCase().includes(q) || t.description.toLowerCase().includes(q));
-    html = items.map(t => {
+    const hordeMatches = !q || HORDE_RULE.name.toLowerCase().includes(q) || HORDE_RULE.description.toLowerCase().includes(q) || 'formation'.includes(q);
+    const hordeCardHtml = hordeMatches ? `
+      <div class="ref-card ref-card-horde">
+        <div class="ref-card-head">
+          <span class="ref-card-title">${escapeHtml(HORDE_RULE.name)} <span style="font-family:var(--font-mono); font-size:11.5px; color:var(--accent); font-weight:600;">(Formation · Irregular 6 or 8 bases)</span></span>
+          <span class="ref-card-cost">Free</span>
+        </div>
+        <div class="ref-card-body">${escapeHtml(HORDE_RULE.description)}</div>
+      </div>
+    ` : '';
+    html = hordeCardHtml + items.map(t => {
       const mods = formatTraitModsShort(t);
       const incompat = Array.from(INCOMPATIBILITY_MAP[t.id] || []);
       return `
@@ -1424,7 +1520,17 @@ function openRuleDetail(type, id) {
   const titleEl = document.getElementById('ruleModalTitle');
   const bodyEl = document.getElementById('ruleModalBody');
 
-  if (type === 'trait' && TRAIT_MAP[id]) {
+  if (type === 'horde') {
+    titleEl.textContent = `${HORDE_RULE.name} (Formation Trait)`;
+    bodyEl.innerHTML = `
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <span class="rule-pill pill-horde"><span class="pill-tag">Trait</span><span>Horde</span></span>
+        <span style="font-family:var(--font-mono); font-weight:700; color:var(--accent);">Free · Irregular Company (6 or 8 bases)</span>
+      </div>
+      <p style="margin:0; line-height:1.6;">${escapeHtml(HORDE_RULE.description)}</p>
+    `;
+    openOverlay('ruleModalOverlay');
+  } else if (type === 'trait' && TRAIT_MAP[id]) {
     const t = TRAIT_MAP[id];
     const mods = formatTraitModsShort(t);
     const incompat = Array.from(INCOMPATIBILITY_MAP[t.id] || []);
@@ -1475,8 +1581,10 @@ function buildPrintSheetHtml(army, includeAppendix, includeZeroBases) {
   const usedSpells = new Set();
   const unitById = Object.fromEntries((army.units || []).map(u => [u.id, u]));
 
+  let hasAnyHorde = false;
   for (const { calc } of rows) {
     for (const tid of calc.traits) usedTraits.add(tid);
+    if (calc.isHorde) hasAnyHorde = true;
     if (calc.relic) usedRelics.add(calc.relic.id);
     for (const sp of calc.spells || []) usedSpells.add(sp.id);
   }
@@ -1488,7 +1596,9 @@ function buildPrintSheetHtml(army, includeAppendix, includeZeroBases) {
   const tableRowsHtml = rows.length > 0
     ? rows.map(({ unit, calc }) => {
         const extras = [];
-        if (calc.traits.length > 0) extras.push(calc.traits.join(', '));
+        const traitNames = [...calc.traits];
+        if (calc.isHorde) traitNames.push(`Horde (${calc.hordeFormation})`);
+        if (traitNames.length > 0) extras.push(traitNames.join(', '));
         if (calc.relic) extras.push(`Relic: ${calc.relic.name}`);
         if (calc.spells?.length > 0) extras.push(`Spells: ${calc.spells.map(s => `${s.id} L${s.level}`).join(', ')}`);
         if (unit.attachedTo && unitById[unit.attachedTo]) extras.push(`Attached → ${unitById[unit.attachedTo].name}`);
@@ -1512,8 +1622,11 @@ function buildPrintSheetHtml(army, includeAppendix, includeZeroBases) {
     : `<tr><td colspan="11" style="padding:18px; color:#666;">No active units with # Bases &gt; 0. Check "Include 0-base units" or add bases to your roster.</td></tr>`;
 
   let appendixHtml = '';
-  if (includeAppendix && (usedTraits.size > 0 || usedRelics.size > 0 || usedSpells.size > 0 || summary.strategies.length > 0)) {
+  if (includeAppendix && (usedTraits.size > 0 || hasAnyHorde || usedRelics.size > 0 || usedSpells.size > 0 || summary.strategies.length > 0)) {
     const entries = [];
+    if (hasAnyHorde) {
+      entries.push(`<div class="ps-rule-entry"><strong>[Formation Trait] ${escapeHtml(HORDE_RULE.name)}:</strong> ${escapeHtml(HORDE_RULE.description)}</div>`);
+    }
     for (const s of summary.strategies) {
       entries.push(`<div class="ps-rule-entry"><strong>[Strategy] ${escapeHtml(s.name)}:</strong> ${escapeHtml(s.description)}</div>`);
     }
@@ -1790,26 +1903,105 @@ function bindEvents() {
     showToast(army.defaultRacial ? `Default racial trait set to ${army.defaultRacial}` : 'Default racial trait cleared');
   });
 
-  document.getElementById('bannerColorPicker').addEventListener('click', e => {
-    const dot = e.target.closest('button[data-banner-color]');
-    if (!dot) return;
-    const army = getCurrentArmy();
-    if (!army) return;
-    army.bannerColor = dot.dataset.bannerColor;
-    saveState();
-    renderAll();
-  });
-
   // Roster Toolbar: Build / Battle Mode, Undo/Redo, Pre-Game, Filters
   document.getElementById('modeBuild').addEventListener('click', () => {
     state.viewMode = 'build';
+    state.mobileTab = 'roster';
     renderAll();
   });
 
   document.getElementById('modeBattle').addEventListener('click', () => {
     state.viewMode = 'battle';
+    state.mobileTab = 'battle';
     renderAll();
   });
+
+  // Mobile Collapsible Options Toggle
+  const mobileOptBtn = document.getElementById('btnMobileCommandToggle');
+  if (mobileOptBtn) {
+    mobileOptBtn.addEventListener('click', () => {
+      state.mobileOptionsOpen = !state.mobileOptionsOpen;
+      renderAll();
+    });
+  }
+
+  // Tappable Army Status Badge -> Jump to Breakdown / Validation Alerts
+  const statusBadgeEl = document.getElementById('armyStatusBadge');
+  if (statusBadgeEl) {
+    const jumpToBreakdown = () => {
+      if (window.innerWidth <= 768) {
+        state.mobileTab = 'tactics';
+        renderAll();
+      }
+      setTimeout(() => {
+        const target = document.querySelector('#validationAlerts .alert') || document.getElementById('breakdownContent');
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          const panel = target.closest('.panel');
+          if (panel) {
+            panel.classList.add('panel-flash');
+            setTimeout(() => panel.classList.remove('panel-flash'), 900);
+          }
+        }
+      }, 40);
+    };
+    statusBadgeEl.addEventListener('click', jumpToBreakdown);
+    statusBadgeEl.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        jumpToBreakdown();
+      }
+    });
+  }
+
+  // Mobile Bottom Navigation Bar
+  const mobileNav = document.getElementById('mobileBottomNav');
+  if (mobileNav) {
+    mobileNav.addEventListener('click', e => {
+      const btn = e.target.closest('.mobile-nav-btn[data-mobile-tab]');
+      if (!btn) return;
+      const tab = btn.dataset.mobileTab;
+      if (tab === 'roster') {
+        state.viewMode = 'build';
+        state.mobileTab = 'roster';
+        renderAll();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (tab === 'battle') {
+        state.viewMode = 'battle';
+        state.mobileTab = 'battle';
+        renderAll();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (tab === 'tactics') {
+        state.mobileTab = 'tactics';
+        renderAll();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (tab === 'presets') {
+        document.getElementById('btnTemplates').click();
+      } else if (tab === 'more') {
+        openOverlay('mobileMoreOverlay');
+      }
+    });
+  }
+
+  // Mobile More Actions Bottom Sheet
+  const mobileMoreGrid = document.getElementById('mobileMoreGrid');
+  if (mobileMoreGrid) {
+    mobileMoreGrid.addEventListener('click', e => {
+      const btn = e.target.closest('button[data-more-action]');
+      if (!btn || btn.disabled) return;
+      const action = btn.dataset.moreAction;
+      closeOverlay('mobileMoreOverlay');
+      if (action === 'save') document.getElementById('btnSaveArmy').click();
+      else if (action === 'compare') document.getElementById('btnCompare').click();
+      else if (action === 'rules') document.getElementById('btnCompendium').click();
+      else if (action === 'print') document.getElementById('btnPrint').click();
+      else if (action === 'share') document.getElementById('btnShare').click();
+      else if (action === 'pregame') document.getElementById('btnPregame').click();
+      else if (action === 'new-army') document.getElementById('btnNewArmy').click();
+      else if (action === 'clear-bases') document.getElementById('btnResetBases').click();
+      else if (action === 'delete-army') document.getElementById('btnDeleteArmy').click();
+    });
+  }
 
   document.getElementById('btnUndo').addEventListener('click', performUndo);
   document.getElementById('btnRedo').addEventListener('click', performRedo);
@@ -1890,6 +2082,9 @@ function bindEvents() {
       if (u) {
         pushUndoSnapshot();
         u.bases = (u.bases || 0) + 1;
+        if (u.company !== 'Irregular company' || (u.bases !== 6 && u.bases !== 8)) {
+          u.horde = false;
+        }
         saveState();
         renderAll();
       }
@@ -1898,8 +2093,21 @@ function bindEvents() {
       if (u && (u.bases || 0) > 0) {
         pushUndoSnapshot();
         u.bases -= 1;
+        if (u.company !== 'Irregular company' || (u.bases !== 6 && u.bases !== 8)) {
+          u.horde = false;
+        }
         saveState();
         renderAll();
+      }
+    } else if (action === 'toggle-horde') {
+      const u = army.units.find(x => x.id === uid);
+      if (u && u.company === 'Irregular company' && (u.bases === 6 || u.bases === 8)) {
+        pushUndoSnapshot();
+        u.horde = !u.horde;
+        saveState();
+        renderAll();
+        const form = u.bases === 8 ? '4×2' : '3×2';
+        showToast(u.horde ? `Formed Horde (${form}) — +1 front Mel/Charge & +1 Sht` : 'Disbanded Horde formation');
       }
     } else if (action === 'move-unit-up' || action === 'move-unit-down') {
       const dir = action === 'move-unit-up' ? -1 : 1;
@@ -2077,6 +2285,16 @@ function bindEvents() {
   document.getElementById('editUnitBases').addEventListener('input', e => {
     if (!state.editor.draft) return;
     state.editor.draft.bases = Math.max(0, parseInt(e.target.value, 10) || 0);
+    if (state.editor.draft.bases !== 6 && state.editor.draft.bases !== 8) {
+      state.editor.draft.horde = false;
+    }
+    renderEditor();
+  });
+
+  document.getElementById('editorHordeBox').addEventListener('click', e => {
+    const btn = e.target.closest('button[data-action="editor-toggle-horde"]');
+    if (!btn || !state.editor.draft) return;
+    state.editor.draft.horde = !state.editor.draft.horde;
     renderEditor();
   });
 
@@ -2485,6 +2703,7 @@ function bindEvents() {
               spells: cleanSpells,
               notes: String(u.notes || ''),
               attachedTo: '',
+              horde: Boolean(u.horde),
               bases: Math.max(0, parseInt(u.bases, 10) || 0)
             };
           })
@@ -2563,3 +2782,10 @@ initTheme();
 loadState();
 bindEvents();
 renderAll();
+
+// Register Offline-Ready Service Worker (safe no-op if unsupported)
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}

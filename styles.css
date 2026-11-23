@@ -239,6 +239,10 @@ button {
   padding: 5px 5px;
   min-width: 125px;
   max-width: 170px;
+  height: 30px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   outline: none;
   cursor: pointer;
 }
@@ -274,6 +278,7 @@ button {
   line-height: 1.2;
   transition: background 0.15s, border-color 0.15s, transform 0.1s, box-shadow 0.15s;
   white-space: nowrap;
+  touch-action: manipulation;
 }
 
 .btn:hover:not(:disabled) {
@@ -2026,36 +2031,7 @@ button {
 }
 
 .command-bar {
-  border-top: 3px solid var(--banner-accent, var(--accent));
-}
-
-.banner-picker {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: var(--bg-surface-alt);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 5px 8px;
-}
-
-.banner-dot {
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  padding: 0;
-  transition: transform 0.12s, border-color 0.12s;
-}
-
-.banner-dot:hover {
-  transform: scale(1.18);
-}
-
-.banner-dot.active {
-  border-color: var(--text-primary);
-  box-shadow: 0 0 0 2px var(--bg-surface);
-  transform: scale(1.15);
+  border-top: 3px solid var(--accent);
 }
 
 /* Drag & Drop */
@@ -3064,4 +3040,832 @@ button {
   font-size: 12.5px;
   color: var(--text-muted);
   text-align: center;
+}
+
+/* ==========================================================================
+   Horde Formation Trait & Toggle Styling (v1.2 Rules)
+   ========================================================================== */
+
+.pill-horde {
+  background: rgba(234, 88, 12, 0.14);
+  color: #c2410c;
+  border-color: rgba(234, 88, 12, 0.45);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .pill-horde {
+  background: rgba(249, 115, 22, 0.18);
+  color: #fdba74;
+  border-color: rgba(249, 115, 22, 0.52);
+}
+
+.unit-horde-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-horde-toggle {
+  border-color: rgba(234, 88, 12, 0.55);
+  color: #c2410c;
+  background: rgba(234, 88, 12, 0.1);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .btn-horde-toggle {
+  border-color: rgba(249, 115, 22, 0.55);
+  color: #fdba74;
+  background: rgba(249, 115, 22, 0.14);
+}
+
+.btn-horde-toggle:hover:not(:disabled) {
+  border-color: #f97316;
+  background: rgba(249, 115, 22, 0.22);
+}
+
+.btn-horde-toggle.active {
+  background: #ea580c;
+  border-color: #ea580c;
+  color: #ffffff;
+}
+
+.btn-horde-toggle.active:hover:not(:disabled) {
+  background: #c2410c;
+  border-color: #c2410c;
+}
+
+.horde-editor-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(249, 115, 22, 0.48);
+  background: rgba(249, 115, 22, 0.1);
+}
+
+.horde-editor-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.horde-editor-sub {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.ref-card-horde {
+  border-left: 3px solid #ea580c;
+}
+
+.cmp-horde-tag {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 1px 5px;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(249, 115, 22, 0.2);
+  color: #fdba74;
+  border: 1px solid rgba(249, 115, 22, 0.45);
+  vertical-align: middle;
+}
+
+:root:not([data-theme="dark"]) .cmp-horde-tag {
+  color: #c2410c;
+}
+
+@media (max-width: 768px) {
+  .unit-horde-row {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .btn-horde-toggle {
+    width: 100%;
+    min-height: 36px;
+  }
+
+  .horde-editor-box {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ==========================================================================
+   Mobile App Chrome & Small-Screen Responsive Suite (<= 768px)
+   Desktop (> 768px) keeps layout completely unchanged
+   ========================================================================== */
+
+.army-name-row,
+.army-settings-row,
+.command-bottom-right {
+  display: contents;
+}
+
+#armyStatusBadge {
+  cursor: pointer;
+  transition: transform 0.1s, filter 0.15s;
+  touch-action: manipulation;
+}
+
+#armyStatusBadge:hover {
+  filter: brightness(1.08);
+}
+
+#armyStatusBadge:active {
+  transform: scale(0.97);
+}
+
+.panel.panel-flash {
+  box-shadow: 0 0 0 2px var(--accent), var(--shadow-md);
+  transition: box-shadow 0.25s ease;
+}
+
+.mobile-only-btn,
+.mobile-bottom-nav {
+  display: none;
+}
+
+.mobile-more-modal {
+  max-width: 480px;
+}
+
+.mobile-more-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.mobile-more-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 10px;
+  min-height: 76px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface-alt);
+  color: var(--text-primary);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+}
+
+.mobile-more-tile:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.mobile-more-tile.primary {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  min-height: 50px;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #16130e;
+}
+
+.mobile-more-tile.danger {
+  color: var(--danger);
+  border-color: var(--danger-border);
+  background: var(--danger-bg);
+}
+
+.mobile-more-tile:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+    overflow-x: hidden;
+  }
+
+  /* Slim 1-row native-feeling mobile topbar */
+  .topbar {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .topbar-inner {
+    padding: 7px 12px;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .brand {
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .brand > div:last-child {
+    display: none;
+  }
+
+  .emblem-crest {
+    width: 36px;
+    height: 36px;
+    padding: 3px;
+  }
+
+  .topbar-center {
+    flex: 1;
+    min-width: 0;
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+
+  .army-switcher {
+    flex: 1;
+    min-width: 0;
+    padding: 2px 6px;
+  }
+
+  .army-switcher select {
+    flex: 1;
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+    height: 34px;
+    font-size: 14px;
+  }
+
+  #btnNewArmy,
+  #btnDeleteArmy,
+  #btnTemplates,
+  #btnCompare,
+  #btnCompendium,
+  #btnPrint,
+  #btnShare {
+    display: none !important;
+  }
+
+  #btnSaveArmy {
+    padding: 0 10px;
+    height: 36px;
+    flex-shrink: 0;
+  }
+
+  .btn-save-label {
+    display: none;
+  }
+
+  .topbar-actions {
+    flex-shrink: 0;
+    gap: 4px;
+  }
+
+  #btnTheme {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* Ultra-compact collapsible Command Bar on mobile */
+  .command-bar-inner {
+    padding: 8px 12px;
+    gap: 7px;
+  }
+
+  body.modal-open {
+    overflow: hidden;
+  }
+
+  .command-top {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 7px;
+  }
+
+  .army-identity {
+    display: none;
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed var(--border-subtle);
+  }
+
+  .command-bar.mobile-options-open .army-identity {
+    display: flex;
+  }
+
+  .army-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .army-name-input {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+    margin-left: 0;
+    font-size: 16px !important;
+    padding: 6px 9px;
+    background: var(--bg-surface-alt);
+    border-color: var(--border-subtle);
+  }
+
+  .mobile-only-btn {
+    display: inline-flex;
+    flex-shrink: 0;
+    height: 30px;
+    padding: 0 10px;
+    font-size: 11.5px;
+  }
+
+  .army-settings-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .inline-setting {
+    flex: 1 1 135px;
+    justify-content: space-between;
+    padding: 5px 8px;
+  }
+
+  .inline-setting select,
+  .inline-setting input {
+    font-size: 15px;
+  }
+
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: 1.25fr 0.92fr 0.83fr;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .kpi-box {
+    min-width: 0;
+    padding: 5px 7px;
+  }
+
+  .kpi-label {
+    font-size: 9px;
+    letter-spacing: 0.03em;
+  }
+
+  .kpi-value {
+    font-size: 14.5px;
+  }
+
+  .kpi-sub {
+    font-size: 9.5px;
+  }
+
+  .command-bottom {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .command-bottom-right {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .limit-pills {
+    display: none;
+    gap: 5px;
+  }
+
+  .command-bar.mobile-options-open .limit-pills {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .status-badge {
+    font-size: 11.5px;
+    padding: 4px 10px;
+  }
+
+  /* Workspace Mobile Tab Switching */
+  .workspace {
+    padding: 10px 12px;
+    gap: 12px;
+  }
+
+  .workspace[data-mobile-tab="roster"] .sidebar,
+  .workspace[data-mobile-tab="battle"] .sidebar {
+    display: none;
+  }
+
+  .workspace[data-mobile-tab="tactics"] .roster-column {
+    display: none;
+  }
+
+  .workspace[data-mobile-tab="tactics"] .sidebar {
+    display: flex;
+  }
+
+  /* Compact 2-row Mobile Roster Toolbar */
+  .roster-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 7px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .roster-toolbar.is-battle-mode {
+    display: none;
+  }
+
+  .mode-switcher,
+  #btnPregame,
+  #btnResetBases {
+    display: none !important;
+  }
+
+  .toolbar-left,
+  #buildOnlyFilters,
+  .toolbar-right {
+    display: contents !important;
+  }
+
+  .search-wrap {
+    grid-column: 1;
+    grid-row: 1;
+    width: 100%;
+  }
+
+  .search-wrap .input {
+    width: 100%;
+    font-size: 16px;
+    padding: 7px 10px 7px 30px;
+    height: 36px;
+  }
+
+  #undoRedoGroup {
+    grid-column: 2;
+    grid-row: 1;
+    margin-right: 0 !important;
+  }
+
+  .segmented:not(.mode-switcher) {
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .segmented button {
+    padding: 7px 6px;
+    font-size: 12.5px;
+  }
+
+  #btnAddUnit {
+    grid-column: 2;
+    grid-row: 2;
+    height: 36px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .btn-reorder {
+    min-width: 34px;
+    min-height: 36px;
+    font-size: 14px;
+  }
+
+  /* Touch-friendly Unit Cards on small screens */
+  .unit-card {
+    padding: 10px 11px;
+    gap: 8px;
+  }
+
+  /* Compact 0-base catalog cards for fast mobile scanning */
+  .unit-card.inactive-unit {
+    padding: 8px 10px;
+    gap: 6px;
+    opacity: 0.9;
+  }
+
+  .unit-card.inactive-unit .unit-controls {
+    padding-top: 6px;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .unit-card.inactive-unit .unit-cost-row {
+    flex: 1;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .unit-card.inactive-unit .unit-total-pts {
+    display: none;
+  }
+
+  .unit-card.inactive-unit .unit-each-pts {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  .unit-card.inactive-unit .unit-actions .reorder-btns,
+  .unit-card.inactive-unit .unit-actions [data-action="dup-unit"],
+  .unit-card.inactive-unit .unit-actions [data-action="del-unit"] {
+    display: none;
+  }
+
+  .unit-card.inactive-unit .stat-cell {
+    padding: 3px 2px;
+  }
+
+  .unit-name {
+    font-size: 14.5px;
+  }
+
+  .stat-strip {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 3px;
+    width: 100%;
+  }
+
+  .stat-cell {
+    min-width: 0;
+    padding: 4px 2px;
+  }
+
+  .stat-lbl {
+    font-size: 8.5px;
+  }
+
+  .stat-val {
+    font-size: 12.5px;
+  }
+
+  .stepper button {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    touch-action: manipulation;
+  }
+
+  .stepper-val {
+    min-width: 30px;
+    font-size: 15px;
+  }
+
+  .unit-actions {
+    gap: 4px;
+  }
+
+  .unit-actions .btn-sm {
+    min-height: 34px;
+    padding: 5px 9px;
+  }
+
+  /* Battle Mode touch targets on mobile */
+  .battle-header {
+    padding: 12px;
+  }
+
+  .battle-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .resolve-pip {
+    width: 28px;
+    height: 28px;
+    touch-action: manipulation;
+  }
+
+  .battle-card-actions {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .battle-card-actions .btn {
+    min-height: 36px;
+  }
+
+  /* Full-screen Unit Forge Drawer on mobile */
+  .drawer {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100dvh;
+  }
+
+  .drawer-header,
+  .drawer-footer {
+    padding: 12px 14px;
+  }
+
+  .drawer-footer {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .drawer-body {
+    padding: 12px 14px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .drawer-body .input,
+  .drawer-body .select,
+  .drawer-body textarea,
+  .modal-body .input,
+  .modal-body .select,
+  .modal-body textarea {
+    font-size: 16px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Bottom-sheet Modals on mobile */
+  .overlay.center {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal,
+  .modal-lg {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 92dvh;
+    border-radius: 16px 16px 0 0;
+    margin: 0;
+  }
+
+  .modal-header {
+    padding: 13px 15px;
+  }
+
+  .modal-header h2 {
+    font-size: 16px;
+  }
+
+  .modal-body {
+    padding: 12px 14px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-footer {
+    padding: 11px 14px calc(11px + env(safe-area-inset-bottom, 0px));
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .template-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  #templatesSearch,
+  #compendiumSearch {
+    width: 100% !important;
+  }
+
+  .cmp-picker-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #btnCompareSwap {
+    align-self: stretch !important;
+    width: 100%;
+  }
+
+  /* Mobile Bottom Navigation Bar */
+  .mobile-bottom-nav {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 45;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-subtle);
+    box-shadow: 0 -4px 18px rgba(7, 8, 5, 0.25);
+    padding: 4px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .mobile-nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 50px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 10.5px;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: color 0.15s, background 0.15s;
+  }
+
+  .mobile-nav-btn.active {
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .mobile-nav-icon-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobile-nav-badge {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: var(--radius-full);
+    background: var(--accent);
+    color: #16130e;
+    font-size: 10px;
+    font-weight: 700;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+  }
+
+  .mobile-nav-badge.danger {
+    background: var(--danger);
+    color: #fff;
+  }
+
+  /* Lift Toast above Bottom Navigation Bar */
+  .toast {
+    bottom: calc(74px + env(safe-area-inset-bottom, 0px));
+    max-width: calc(100vw - 24px);
+    text-align: center;
+  }
+}
+
+@media (max-width: 520px) {
+  .cmp-tug-row {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "label label"
+      "sideA sideB";
+    gap: 4px 8px;
+    padding: 6px 8px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+  }
+
+  .cmp-tug-label {
+    grid-area: label;
+    font-size: 11px;
+    text-align: center;
+  }
+
+  .cmp-tug-side.side-a {
+    grid-area: sideA;
+  }
+
+  .cmp-tug-side.side-b {
+    grid-area: sideB;
+  }
+
+  .cmp-tug-val {
+    min-width: 42px;
+    font-size: 11.5px;
+  }
+}
+
+@media print {
+  .mobile-bottom-nav,
+  #mobileMoreOverlay,
+  .mobile-only-btn {
+    display: none !important;
+  }
+
+  body {
+    padding-bottom: 0 !important;
+  }
 }

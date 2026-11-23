@@ -137,6 +137,16 @@ export function computeUnit(unit) {
     costBreakdown.push({ label: relicObj.name, cost: relicObj.cost });
   }
 
+  // Horde formation (v1.2): Irregular company with 6 (3×2) or 8 (4×2) bases
+  const canFormHorde = profile.id === 'Irregular company' && (bases === 6 || bases === 8);
+  const isHorde = canFormHorde && Boolean(unit.horde);
+  const hordeFormation = isHorde ? (bases === 8 ? '4×2' : '3×2') : (canFormHorde ? (bases === 8 ? '4×2' : '3×2') : '');
+
+  if (isHorde) {
+    if (shtShort > 0) shtShort += 1;
+    if (shtLong > 0) shtLong += 1;
+  }
+
   // Clamp non-negative stats
   res = Math.max(0, res);
   mov = Math.max(0, mov);
@@ -206,6 +216,9 @@ export function computeUnit(unit) {
     charInfo,
     isCompany,
     countsTowardBP,
+    canFormHorde,
+    isHorde,
+    hordeFormation,
     costBreakdown,
     deltas: {
       res: res - profile.res,
@@ -425,7 +438,9 @@ export function exportArmyText(army) {
 
   const fmtRow = ({ unit, calc }) => {
     const extras = [];
-    if (calc.traits.length) extras.push(calc.traits.join(', '));
+    const traitList = [...calc.traits];
+    if (calc.isHorde) traitList.push(`Horde (${calc.hordeFormation})`);
+    if (traitList.length) extras.push(traitList.join(', '));
     if (calc.relic) extras.push(`Relic: ${calc.relic.name}`);
     if (calc.spells.length) extras.push(`Spells: ${calc.spells.map(s => `${s.id} L${s.level}`).join(', ')}`);
     if (unit.attachedTo && unitById[unit.attachedTo]) extras.push(`Attached → ${unitById[unit.attachedTo].name}`);
@@ -475,9 +490,10 @@ export function encodeArmyToShareHash(army) {
         u.relic || '',
         u.bases || 0
       ];
-      if ((u.spells && Object.keys(u.spells).length) || u.notes) {
+      if ((u.spells && Object.keys(u.spells).length) || u.notes || u.horde) {
         row.push(u.spells || {});
         row.push(u.notes || '');
+        if (u.horde) row.push(1);
       }
       return row;
     })
@@ -525,7 +541,8 @@ export function decodeArmyFromShareHash(hash) {
           relic: RELIC_MAP[row[4]] ? row[4] : '',
           bases: Math.max(0, parseInt(row[5], 10) || 0),
           spells: cleanSpells,
-          notes: String(row[7] || '')
+          notes: String(row[7] || ''),
+          horde: Boolean(row[8])
         };
       })
     };
