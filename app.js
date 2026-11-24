@@ -15,7 +15,7 @@ import {
   SPELL_MAP,
   INCOMPATIBILITY_MAP,
   PRESET_ARMIES
-} from './data.js?v=5';
+} from './data.js?v=6';
 
 import {
   generateId,
@@ -28,7 +28,7 @@ import {
   exportArmyText,
   encodeArmyToShareHash,
   decodeArmyFromShareHash
-} from './engine.js?v=5';
+} from './engine.js?v=6';
 
 import {
   renderBattleModeHtml,
@@ -36,16 +36,16 @@ import {
   renderPregameModalHtml,
   handlePregameAction,
   buildPrintCardsHtml
-} from './battle.js?v=5';
+} from './battle.js?v=6';
 
 import {
   UNIT_ICONS,
   UNIT_ICON_MAP,
   detectUnitIconId,
   renderUnitIconHtml
-} from './icons.js?v=5';
+} from './icons.js?v=6';
 
-import { renderComparisonHtml } from './compare.js?v=5';
+import { renderComparisonHtml } from './compare.js?v=6';
 
 const STORAGE_KEY = 'fb_army_builder_v1';
 const CUSTOM_PRESETS_KEY = 'fb_custom_presets_v1';
@@ -1130,15 +1130,15 @@ function renderEditor() {
       const canAdd = lvl < 3 && usedLevels < maxLevels;
       return `
         <div class="spell-row ${lvl > 0 ? 'active-spell' : ''}">
-          <div class="spell-row-meta">
-            <div class="spell-row-name">${escapeHtml(sp.name)} <span class="spell-row-info">(${escapeHtml(sp.difficulty)} · ${escapeHtml(sp.range)})</span></div>
-            <div class="spell-row-info">${escapeHtml(sp.description.slice(0, 95))}${sp.description.length > 95 ? '…' : ''}</div>
+          <div class="spell-row-head">
+            <div class="spell-row-name">${escapeHtml(sp.name)} <span class="spell-row-meta-tag">${escapeHtml(sp.difficulty)} &middot; ${escapeHtml(sp.range)}</span></div>
+            <div class="stepper">
+              <button type="button" data-action="dec-spell" data-spell-id="${escapeHtml(sp.id)}" ${lvl <= 0 ? 'disabled' : ''}>&minus;</button>
+              <span class="stepper-val">L${lvl}</span>
+              <button type="button" data-action="inc-spell" data-spell-id="${escapeHtml(sp.id)}" ${!canAdd ? 'disabled' : ''}>+</button>
+            </div>
           </div>
-          <div class="stepper">
-            <button type="button" data-action="dec-spell" data-spell-id="${escapeHtml(sp.id)}" ${lvl <= 0 ? 'disabled' : ''}>&minus;</button>
-            <span class="stepper-val">L${lvl}</span>
-            <button type="button" data-action="inc-spell" data-spell-id="${escapeHtml(sp.id)}" ${!canAdd ? 'disabled' : ''}>+</button>
-          </div>
+          <div class="spell-row-info">${escapeHtml(sp.description)}</div>
         </div>
       `;
     }).join('');
