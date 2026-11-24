@@ -975,6 +975,7 @@ button {
 .stepper {
   display: inline-flex;
   align-items: center;
+  flex-shrink: 0;
   background: var(--bg-surface-alt);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
@@ -2145,6 +2146,7 @@ button {
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
   background: var(--bg-surface);
+  min-width: 0;
 }
 
 .spell-row.active-spell {
@@ -2153,7 +2155,13 @@ button {
 }
 
 .spell-row-meta {
+  flex: 1 1 0;
   min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.spell-row .stepper {
+  flex-shrink: 0;
 }
 
 .spell-row-name {
@@ -3638,7 +3646,30 @@ button {
 
   .stepper-val {
     min-width: 30px;
-    font-size: 15px;
+    font-size: 14px;
+    line-height: 36px;
+  }
+
+  .spell-picker-grid {
+    padding: 8px;
+    gap: 7px;
+  }
+
+  .spell-row {
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .spell-row .stepper button {
+    width: 34px;
+    height: 34px;
+    font-size: 17px;
+  }
+
+  .spell-row .stepper-val {
+    min-width: 30px;
+    font-size: 13px;
+    line-height: 34px;
   }
 
   .unit-actions {
