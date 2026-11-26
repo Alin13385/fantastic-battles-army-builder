@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=6" />
+  <link rel="stylesheet" href="styles.css?v=7" />
 </head>
 <body>
   <div class="app-shell">
@@ -259,7 +259,15 @@
           Unofficial fan-made companion for <strong>Fantastic Battles</strong> by Nic Wright (<a href="https://irregularwars.com" target="_blank" rel="noopener noreferrer">Irregular Wars</a>)
           &middot; Inspired by Mike Wilson&rsquo;s <a href="https://irregularwars.com/pages/downloads" target="_blank" rel="noopener noreferrer">Excel Army Builder</a>
         </span>
-        <a class="app-footer-cta" href="https://irregularwars.com" target="_blank" rel="noopener noreferrer">Official Rules &amp; Downloads &#8599;</a>
+        <div class="app-footer-links">
+          <button id="btnOpenFeedback" type="button" class="btn btn-sm btn-ghost app-footer-feedback-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            Report Bug / Feedback
+          </button>
+          <a class="app-footer-cta" href="https://irregularwars.com" target="_blank" rel="noopener noreferrer">Official Rules &amp; Downloads &#8599;</a>
+        </div>
       </div>
     </footer>
 
@@ -364,6 +372,12 @@
               <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
             </svg>
             <span>Clear All Bases</span>
+          </button>
+          <button type="button" class="mobile-more-tile" data-more-action="feedback">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <span>Report Bug / Feedback</span>
           </button>
           <button type="button" id="btnMobileDeleteArmy" class="mobile-more-tile danger" data-more-action="delete-army">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -787,12 +801,72 @@
     </div>
   </div>
 
+  <!-- ======================================================================
+       Modal: Report Bug / Feedback (Privacy-Safe Web3Forms)
+       ====================================================================== -->
+  <div id="feedbackModalOverlay" class="overlay center" aria-hidden="true">
+    <div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="feedbackModalTitle">
+      <div class="modal-header">
+        <h2 id="feedbackModalTitle">Report a Bug or Send Feedback</h2>
+        <button class="btn btn-icon btn-ghost" data-close-modal="feedbackModalOverlay" aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <form id="feedbackForm" novalidate>
+        <div class="modal-body">
+          <!-- Spam honeypot (hidden from humans) -->
+          <input type="checkbox" name="botcheck" id="feedbackBotcheck" tabindex="-1" autocomplete="off" style="display:none;" />
+
+          <div class="form-group">
+            <label class="form-label" for="feedbackCategory">Topic</label>
+            <select id="feedbackCategory" class="select">
+              <option value="Bug / Rules Error">Bug / Rules Error</option>
+              <option value="Suggestion / Feature Idea">Suggestion / Feature Idea</option>
+              <option value="Faction / Unit Feedback">Faction / Unit Feedback</option>
+              <option value="Mobile / Display Issue">Mobile / Display Issue</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="feedbackMessage">
+              <span>Message *</span>
+              <span class="form-hint">Describe what happened or your idea</span>
+            </label>
+            <textarea id="feedbackMessage" class="input feedback-textarea" rows="5" required placeholder="e.g. On mobile, when I edit a unit..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="feedbackContact">
+              <span>Your Name or Email (optional)</span>
+              <span class="form-hint">Only if you'd like a reply</span>
+            </label>
+            <input id="feedbackContact" class="input" type="text" placeholder="Optional name or email..." />
+          </div>
+
+          <label class="save-preset-opt">
+            <input id="feedbackIncludeDiag" type="checkbox" checked />
+            <span>Include current army link &amp; screen size (helps reproduce bugs faster)</span>
+          </label>
+
+          <div id="feedbackStatus" class="feedback-status" role="status" aria-live="polite" style="display:none;"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" data-close-modal="feedbackModalOverlay">Cancel</button>
+          <button id="btnSubmitFeedback" type="submit" class="btn btn-primary">Send Message</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Native Print Area -->
   <div id="printSheet" class="print-sheet"></div>
 
   <!-- Toast Notification -->
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script type="module" src="app.js?v=6"></script>
+  <script type="module" src="app.js?v=7"></script>
 </body>
 </html>

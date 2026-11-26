@@ -15,7 +15,7 @@ import {
   SPELL_MAP,
   INCOMPATIBILITY_MAP,
   PRESET_ARMIES
-} from './data.js?v=6';
+} from './data.js?v=7';
 
 import {
   generateId,
@@ -28,7 +28,7 @@ import {
   exportArmyText,
   encodeArmyToShareHash,
   decodeArmyFromShareHash
-} from './engine.js?v=6';
+} from './engine.js?v=7';
 
 import {
   renderBattleModeHtml,
@@ -36,20 +36,23 @@ import {
   renderPregameModalHtml,
   handlePregameAction,
   buildPrintCardsHtml
-} from './battle.js?v=6';
+} from './battle.js?v=7';
 
 import {
   UNIT_ICONS,
   UNIT_ICON_MAP,
   detectUnitIconId,
   renderUnitIconHtml
-} from './icons.js?v=6';
+} from './icons.js?v=7';
 
-import { renderComparisonHtml } from './compare.js?v=6';
+import { renderComparisonHtml } from './compare.js?v=7';
 
 const STORAGE_KEY = 'fb_army_builder_v1';
 const CUSTOM_PRESETS_KEY = 'fb_custom_presets_v1';
 const THEME_KEY = 'fb_army_builder_theme_v2';
+
+// Privacy-safe feedback relay (Web3Forms access key — keeps recipient email 100% hidden from source code).
+const FEEDBACK_ACCESS_KEY = 'a58aad40-94b4-451f-9789-a7dc866fca3a';
 
 // ============================================================================
 // Application State
@@ -1809,6 +1812,112 @@ function openShareModal() {
   openOverlay('shareModalOverlay');
 }
 
+function openFeedbackModal() {
+  const statusEl = document.getElementById('feedbackStatus');
+  if (statusEl) {
+    statusEl.style.display = 'none';
+    statusEl.textContent = '';
+    statusEl.className = 'feedback-status';
+  }
+  const submitBtn = document.getElementById('btnSubmitFeedback');
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Send Message';
+  }
+  openOverlay('feedbackModalOverlay');
+  setTimeout(() => document.getElementById('feedbackMessage')?.focus(), 60);
+}
+
+async function handleFeedbackSubmit(e) {
+  e.preventDefault();
+  const statusEl = document.getElementById('feedbackStatus');
+  const submitBtn = document.getElementById('btnSubmitFeedback');
+  const botcheck = document.getElementById('feedbackBotcheck');
+  const category = document.getElementById('feedbackCategory').value;
+  const message = document.getElementById('feedbackMessage').value.trim();
+  const contact = document.getElementById('feedbackContact').value.trim();
+  const includeDiag = document.getElementById('feedbackIncludeDiag').checked;
+
+  const setStatus = (cls, text) => {
+    statusEl.className = `feedback-status ${cls}`;
+    statusEl.textContent = text;
+    statusEl.style.display = 'block';
+  };
+
+  if (botcheck && botcheck.checked) return;
+
+  if (!message || message.length < 5) {
+    setStatus('warn', 'Please write a short message describing the bug or feedback.');
+    document.getElementById('feedbackMessage').focus();
+    return;
+  }
+
+  if (!FEEDBACK_ACCESS_KEY) {
+    setStatus('warn', 'Feedback delivery is not activated yet. Add your free Web3Forms access key in app.js (FEEDBACK_ACCESS_KEY) to receive messages privately.');
+    return;
+  }
+
+  let fullMessage = message;
+  if (includeDiag) {
+    const army = getCurrentArmy();
+    const summary = army ? computeArmy(army) : null;
+    const baseUrl = window.location.href.split('#')[0];
+    const shareLink = army ? `${baseUrl}${encodeArmyToShareHash(army)}` : baseUrl;
+    const diagLines = [
+      '',
+      '--- Diagnostic Info ---',
+      `Page: ${baseUrl}`,
+      `Viewport: ${window.innerWidth}×${window.innerHeight} (${document.documentElement.getAttribute('data-theme') || 'dark'} theme)`,
+      `User-Agent: ${navigator.userAgent}`,
+      army && summary ? `Current Army: ${army.name || 'Untitled'} (${summary.totalPoints}/${summary.pointsLimit} pts, ${summary.activeUnitCount} active units)` : '',
+      army ? `Army Link: ${shareLink}` : ''
+    ].filter(Boolean);
+    fullMessage += '\n' + diagLines.join('\n');
+  }
+
+  const payload = {
+    access_key: FEEDBACK_ACCESS_KEY,
+    subject: `[Fantastic Battles Builder] ${category}`,
+    from_name: contact || 'Fantastic Battles Player',
+    topic: category,
+    contact: contact || '(not provided)',
+    message: fullMessage,
+    botcheck: false
+  };
+  if (contact && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact)) {
+    payload.replyto = contact;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Sending…';
+  statusEl.style.display = 'none';
+
+  try {
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      document.getElementById('feedbackMessage').value = '';
+      setStatus('ok', 'Thank you! Your message has been sent.');
+      showToast('Feedback sent — thank you!');
+      setTimeout(() => closeOverlay('feedbackModalOverlay'), 1400);
+    } else {
+      throw new Error(data.message || 'Submission failed');
+    }
+  } catch {
+    setStatus('error', 'Could not send right now (please check your internet connection and try again).');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Send Message';
+  }
+}
+
 async function copyToClipboard(text, successMsg) {
   try {
     await navigator.clipboard.writeText(text);
@@ -2012,9 +2121,13 @@ function bindEvents() {
       else if (action === 'pregame') document.getElementById('btnPregame').click();
       else if (action === 'new-army') document.getElementById('btnNewArmy').click();
       else if (action === 'clear-bases') document.getElementById('btnResetBases').click();
+      else if (action === 'feedback') openFeedbackModal();
       else if (action === 'delete-army') document.getElementById('btnDeleteArmy').click();
     });
   }
+
+  document.getElementById('btnOpenFeedback')?.addEventListener('click', openFeedbackModal);
+  document.getElementById('feedbackForm')?.addEventListener('submit', handleFeedbackSubmit);
 
   document.getElementById('btnUndo').addEventListener('click', performUndo);
   document.getElementById('btnRedo').addEventListener('click', performRedo);
