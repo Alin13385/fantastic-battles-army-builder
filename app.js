@@ -15,7 +15,7 @@ import {
   SPELL_MAP,
   INCOMPATIBILITY_MAP,
   PRESET_ARMIES
-} from './data.js?v=9';
+} from './data.js?v=10';
 
 import {
   generateId,
@@ -28,7 +28,7 @@ import {
   exportArmyText,
   encodeArmyToShareHash,
   decodeArmyFromShareHash
-} from './engine.js?v=9';
+} from './engine.js?v=10';
 
 import {
   renderBattleModeHtml,
@@ -36,23 +36,23 @@ import {
   renderPregameModalHtml,
   handlePregameAction,
   buildPrintCardsHtml
-} from './battle.js?v=9';
+} from './battle.js?v=10';
 
 import {
   UNIT_ICONS,
   UNIT_ICON_MAP,
   detectUnitIconId,
   renderUnitIconHtml
-} from './icons.js?v=9';
+} from './icons.js?v=10';
 
-import { renderComparisonHtml } from './compare.js?v=9';
+import { renderComparisonHtml } from './compare.js?v=10';
 
 import {
   renderTerrainCompendiumHtml,
   renderTerrainModalHtml,
   handleTerrainClick,
   handleTerrainChange
-} from './terrain.js?v=9';
+} from './terrain.js?v=10';
 
 const STORAGE_KEY = 'fb_army_builder_v1';
 const CUSTOM_PRESETS_KEY = 'fb_custom_presets_v1';
@@ -2772,6 +2772,9 @@ function bindEvents() {
         openCompendiumModal();
       } else if (res.rerender) {
         renderTerrainModal();
+        if (e.target.closest('[data-terrain-action="toggle-mobile-controls"]')) {
+          terrainBody.scrollTop = 0;
+        }
       }
     });
 

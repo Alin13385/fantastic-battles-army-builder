@@ -238,6 +238,7 @@ function defaultSettings() {
 }
 
 let terrainState = null;
+let mobileControlsOpen = false;
 
 export function getTerrainState() {
   if (!terrainState) {
@@ -1374,6 +1375,7 @@ export function renderTerrainModalHtml() {
 
   const openOk = bf.openPct >= 50;
   const countedFeatures = bf.features.filter(f => !f.isRoad).length;
+  const controlsOpenCls = mobileControlsOpen ? ' mobile-controls-open' : '';
 
   const inspectorHtml = selected && selectedRule
     ? `
@@ -1397,7 +1399,7 @@ export function renderTerrainModalHtml() {
     : `
       <div class="terrain-inspector">
         <span style="color:var(--text-secondary); font-size:12.5px;">
-          💡 <strong>Tip:</strong> Click any terrain feature on the map or list below to inspect its exact <strong>Mov / Mel / Sht / LoS</strong> modifiers.
+          💡 <strong>Tip:</strong> Tap any terrain feature on the map or chips to view its <strong>Mov / Mel / Sht / LoS</strong> modifiers.
         </span>
       </div>
     `;
@@ -1415,106 +1417,119 @@ export function renderTerrainModalHtml() {
   }).join('');
 
   return `
-    <div class="terrain-controls-bar">
-      <div class="terrain-control-group">
-        <label class="terrain-ctrl-label">Table Size</label>
-        <div class="segmented">
-          <button type="button" class="${s.tableSize === '30x20' ? 'active' : ''}" data-terrain-action="set-size" data-value="30x20">30×20 bw</button>
-          <button type="button" class="${s.tableSize === '20x20' ? 'active' : ''}" data-terrain-action="set-size" data-value="20x20">20×20 bw</button>
-        </div>
-      </div>
-
-      <div class="terrain-control-group">
-        <label class="terrain-ctrl-label" for="terrainBiomeSelect">Region / Biome</label>
-        <select id="terrainBiomeSelect" class="select terrain-select" data-terrain-select="biome">
-          ${BIOMES.map(b => `<option value="${b.id}" ${s.biome === b.id ? 'selected' : ''}>${escapeHtml(b.name)}</option>`).join('')}
-        </select>
-      </div>
-
-      <div class="terrain-control-group">
-        <label class="terrain-ctrl-label" for="terrainDensitySelect">Density</label>
-        <select id="terrainDensitySelect" class="select terrain-select" data-terrain-select="density">
-          <option value="sparse" ${s.density === 'sparse' ? 'selected' : ''}>Sparse (1–2/sq)</option>
-          <option value="standard" ${s.density === 'standard' ? 'selected' : ''}>Standard (1–3/sq)</option>
-          <option value="dense" ${s.density === 'dense' ? 'selected' : ''}>Dense (2–3/sq)</option>
-        </select>
-      </div>
-
-      <div class="terrain-control-group">
-        <label class="terrain-ctrl-label" for="terrainRiverSelect">River</label>
-        <select id="terrainRiverSelect" class="select terrain-select" data-terrain-select="riverMode">
-          <option value="auto" ${s.riverMode === 'auto' ? 'selected' : ''}>Auto</option>
-          <option value="yes" ${s.riverMode === 'yes' ? 'selected' : ''}>Yes</option>
-          <option value="no" ${s.riverMode === 'no' ? 'selected' : ''}>No</option>
-        </select>
-      </div>
-
-      <div class="terrain-control-group">
-        <label class="terrain-ctrl-label" for="terrainRoadSelect">Road</label>
-        <select id="terrainRoadSelect" class="select terrain-select" data-terrain-select="roadMode">
-          <option value="auto" ${s.roadMode === 'auto' ? 'selected' : ''}>Auto</option>
-          <option value="yes" ${s.roadMode === 'yes' ? 'selected' : ''}>Yes</option>
-          <option value="no" ${s.roadMode === 'no' ? 'selected' : ''}>No</option>
-        </select>
-      </div>
-
-      <div class="terrain-control-actions">
-        <button type="button" class="btn btn-primary" data-terrain-action="reroll">
-          🎲 Generate Map
+    <div class="terrain-gen-root${controlsOpenCls}">
+      <!-- Compact 1-Row Mobile Action Bar (visible <= 768px) -->
+      <div class="terrain-mobile-bar">
+        <button type="button" class="btn btn-sm btn-primary terrain-mobile-gen-btn" data-terrain-action="reroll">
+          🎲 Generate
+        </button>
+        <button type="button" class="btn btn-sm terrain-mobile-opt-btn" data-terrain-action="toggle-mobile-controls" aria-expanded="${String(mobileControlsOpen)}">
+          <span>${s.tableSize === '20x20' ? '20×20' : '30×20'} · ${escapeHtml(bf.biome.name)}</span>
+          <span>${mobileControlsOpen ? '▴' : '▾'}</span>
         </button>
       </div>
-    </div>
 
-    <div class="terrain-meta-strip">
-      <div class="terrain-badges">
-        <span class="terrain-stat-pill ${openOk ? 'ok' : 'warn'}" title="Rulebook recommends at least 50% open ground">
-          ${openOk ? '✓' : '!'} ${bf.openPct}% Open Ground
-        </span>
-        <span class="terrain-stat-pill">
-          ${countedFeatures} Features (${bf.cols * bf.rows} sectors)
-        </span>
-        <span class="terrain-stat-pill mono">Seed #${s.seed}</span>
-      </div>
-      <div class="terrain-toggles">
-        <label class="terrain-chk">
-          <input type="checkbox" data-terrain-toggle="showGrid" ${s.showGrid ? 'checked' : ''} />
-          <span>10×10bw Grid</span>
-        </label>
-        <label class="terrain-chk">
-          <input type="checkbox" data-terrain-toggle="showDeployment" ${s.showDeployment ? 'checked' : ''} />
-          <span>Pitched Battle Zones</span>
-        </label>
-        <label class="terrain-chk">
-          <input type="checkbox" data-terrain-toggle="showLabels" ${s.showLabels ? 'checked' : ''} />
-          <span>Labels</span>
-        </label>
-      </div>
-    </div>
+      <div class="terrain-controls-bar">
+        <div class="terrain-control-group">
+          <label class="terrain-ctrl-label">Table Size</label>
+          <div class="segmented">
+            <button type="button" class="${s.tableSize === '30x20' ? 'active' : ''}" data-terrain-action="set-size" data-value="30x20">30×20 bw</button>
+            <button type="button" class="${s.tableSize === '20x20' ? 'active' : ''}" data-terrain-action="set-size" data-value="20x20">20×20 bw</button>
+          </div>
+        </div>
 
-    <div class="terrain-workspace">
-      <div class="terrain-map-frame">
-        <div class="terrain-ruler-top">${bf.width}bw &times; ${bf.height}bw Tabletop (${escapeHtml(bf.biome.name)})</div>
-        ${renderBattlefieldSvg(bf, s)}
-        <div class="terrain-legend">
-          ${['hill', 'wood', 'rough', 'water', 'settlement', 'impassable', 'linear', 'road'].map(id => {
-            const r = TERRAIN_RULE_MAP[id];
-            return `<span class="terrain-legend-item"><span class="terrain-dot" style="background:${r.color};"></span>${escapeHtml(r.name.replace(' Features', '').replace(' Terrain', ''))}</span>`;
-          }).join('')}
+        <div class="terrain-control-group">
+          <label class="terrain-ctrl-label" for="terrainBiomeSelect">Region / Biome</label>
+          <select id="terrainBiomeSelect" class="select terrain-select" data-terrain-select="biome">
+            ${BIOMES.map(b => `<option value="${b.id}" ${s.biome === b.id ? 'selected' : ''}>${escapeHtml(b.name)}</option>`).join('')}
+          </select>
+        </div>
+
+        <div class="terrain-control-group">
+          <label class="terrain-ctrl-label" for="terrainDensitySelect">Density</label>
+          <select id="terrainDensitySelect" class="select terrain-select" data-terrain-select="density">
+            <option value="sparse" ${s.density === 'sparse' ? 'selected' : ''}>Sparse (1–2/sq)</option>
+            <option value="standard" ${s.density === 'standard' ? 'selected' : ''}>Standard (1–3/sq)</option>
+            <option value="dense" ${s.density === 'dense' ? 'selected' : ''}>Dense (2–3/sq)</option>
+          </select>
+        </div>
+
+        <div class="terrain-control-group">
+          <label class="terrain-ctrl-label" for="terrainRiverSelect">River</label>
+          <select id="terrainRiverSelect" class="select terrain-select" data-terrain-select="riverMode">
+            <option value="auto" ${s.riverMode === 'auto' ? 'selected' : ''}>Auto</option>
+            <option value="yes" ${s.riverMode === 'yes' ? 'selected' : ''}>Yes</option>
+            <option value="no" ${s.riverMode === 'no' ? 'selected' : ''}>No</option>
+          </select>
+        </div>
+
+        <div class="terrain-control-group">
+          <label class="terrain-ctrl-label" for="terrainRoadSelect">Road</label>
+          <select id="terrainRoadSelect" class="select terrain-select" data-terrain-select="roadMode">
+            <option value="auto" ${s.roadMode === 'auto' ? 'selected' : ''}>Auto</option>
+            <option value="yes" ${s.roadMode === 'yes' ? 'selected' : ''}>Yes</option>
+            <option value="no" ${s.roadMode === 'no' ? 'selected' : ''}>No</option>
+          </select>
+        </div>
+
+        <div class="terrain-control-actions">
+          <button type="button" class="btn btn-primary" data-terrain-action="reroll">
+            🎲 Generate Map
+          </button>
         </div>
       </div>
 
-      <div class="terrain-side-panel">
-        ${inspectorHtml}
+      <div class="terrain-meta-strip">
+        <div class="terrain-badges">
+          <span class="terrain-stat-pill ${openOk ? 'ok' : 'warn'}" title="Rulebook recommends at least 50% open ground">
+            ${openOk ? '✓' : '!'} ${bf.openPct}% Open<span class="hide-xs"> Ground</span>
+          </span>
+          <span class="terrain-stat-pill">
+            ${countedFeatures} Feat.<span class="hide-xs"> (${bf.cols * bf.rows} sectors)</span>
+          </span>
+          <span class="terrain-stat-pill mono hide-xs">Seed #${s.seed}</span>
+        </div>
+        <div class="terrain-toggles">
+          <label class="terrain-chk terrain-chk-secondary">
+            <input type="checkbox" data-terrain-toggle="showGrid" ${s.showGrid ? 'checked' : ''} />
+            <span>Grid</span>
+          </label>
+          <label class="terrain-chk">
+            <input type="checkbox" data-terrain-toggle="showDeployment" ${s.showDeployment ? 'checked' : ''} />
+            <span>Zones</span>
+          </label>
+          <label class="terrain-chk terrain-chk-secondary">
+            <input type="checkbox" data-terrain-toggle="showLabels" ${s.showLabels ? 'checked' : ''} />
+            <span>Labels</span>
+          </label>
+        </div>
+      </div>
 
-        <div class="terrain-feature-list-wrap">
-          <div class="terrain-feature-list-head">
-            <strong>Placed Features (${bf.features.length})</strong>
-            <div style="display:flex; gap:6px; flex-wrap:wrap;">
-              <button type="button" class="btn btn-sm" data-terrain-action="copy-layout">Copy Text</button>
-              <button type="button" class="btn btn-sm" data-terrain-action="open-terrain-rules">Terrain Rules</button>
-            </div>
+      <div class="terrain-workspace">
+        <div class="terrain-map-frame">
+          <div class="terrain-ruler-top">${bf.width}bw &times; ${bf.height}bw Tabletop (${escapeHtml(bf.biome.name)})</div>
+          ${renderBattlefieldSvg(bf, s)}
+          <div class="terrain-legend">
+            ${['hill', 'wood', 'rough', 'water', 'settlement', 'impassable', 'linear', 'road'].map(id => {
+              const r = TERRAIN_RULE_MAP[id];
+              return `<span class="terrain-legend-item"><span class="terrain-dot" style="background:${r.color};"></span>${escapeHtml(r.name.replace(' Features', '').replace(' Terrain', ''))}</span>`;
+            }).join('')}
           </div>
-          <div class="terrain-feature-chips">${featureChipsHtml}</div>
+        </div>
+
+        <div class="terrain-side-panel">
+          ${inspectorHtml}
+
+          <div class="terrain-feature-list-wrap">
+            <div class="terrain-feature-list-head">
+              <strong>Placed Features (${bf.features.length})</strong>
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button type="button" class="btn btn-sm" data-terrain-action="copy-layout">Copy Text</button>
+                <button type="button" class="btn btn-sm" data-terrain-action="open-terrain-rules">Terrain Rules</button>
+              </div>
+            </div>
+            <div class="terrain-feature-chips">${featureChipsHtml}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -1552,6 +1567,10 @@ export function handleTerrainClick(target) {
   if (!btn) return { rerender: false };
 
   const action = btn.dataset.terrainAction;
+  if (action === 'toggle-mobile-controls') {
+    mobileControlsOpen = !mobileControlsOpen;
+    return { rerender: true };
+  }
   if (action === 'reroll') {
     s.seed = Math.floor(Math.random() * 900000) + 100000;
     s.selectedFeatureId = null;

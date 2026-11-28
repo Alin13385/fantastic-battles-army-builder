@@ -4,15 +4,15 @@ import {
   TRAIT_MAP,
   RELIC_MAP,
   SPELL_MAP
-} from './data.js?v=9';
+} from './data.js?v=10';
 
 import {
   computeArmy,
   formatShooting,
   formatDefence
-} from './engine.js?v=9';
+} from './engine.js?v=10';
 
-import { renderUnitIconHtml } from './icons.js?v=9';
+import { renderUnitIconHtml } from './icons.js?v=10';
 
 const BATTLE_STORAGE_KEY = 'fb_battle_state_v1';
 
