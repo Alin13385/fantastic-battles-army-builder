@@ -4177,6 +4177,11 @@ button {
   height: 34px;
   padding: 4px 10px;
   font-size: 12.5px;
+  width: 100%;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .terrain-control-actions {
@@ -4315,9 +4320,13 @@ button {
 
 .map-sector-tag {
   font-family: var(--font-mono);
-  font-size: 0.72px;
+  font-size: 0.74px;
   font-weight: 700;
-  fill: rgba(255, 255, 255, 0.52);
+  fill: rgba(255, 250, 224, 0.9);
+  paint-order: stroke;
+  stroke: rgba(12, 16, 10, 0.8);
+  stroke-width: 0.2px;
+  stroke-linejoin: round;
   pointer-events: none;
 }
 

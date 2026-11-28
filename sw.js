@@ -1,16 +1,16 @@
 // Fantastic Battles — Offline-Ready Service Worker (Network-First with Cache Fallback)
-const CACHE_NAME = 'fb-army-builder-v10';
+const CACHE_NAME = 'fb-army-builder-v11';
 const APP_SHELL = [
   './',
   './index.html',
-  './styles.css?v=10',
-  './app.js?v=10',
-  './data.js?v=10',
-  './engine.js?v=10',
-  './battle.js?v=10',
-  './compare.js?v=10',
-  './terrain.js?v=10',
-  './icons.js?v=10',
+  './styles.css?v=11',
+  './app.js?v=11',
+  './data.js?v=11',
+  './engine.js?v=11',
+  './battle.js?v=11',
+  './compare.js?v=11',
+  './terrain.js?v=11',
+  './icons.js?v=11',
   './favicon.svg',
   './manifest.webmanifest'
 ];

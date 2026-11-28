@@ -1218,29 +1218,41 @@ export function renderBattlefieldSvg(bf, settings) {
   const { width, height, cols, rows } = bf;
   const colLetters = ['A', 'B', 'C'];
 
-  // 10x10bw sector grid + labels
+  // 10x10bw sector grid + 5bw subtle guides + crisp 2bw border ticks + high-contrast sector labels
   let gridSvg = '';
   if (settings.showGrid) {
     const lines = [];
+    // Subtle 5bw half-sector guide lines
+    for (let x = 5; x < width; x += 10) {
+      lines.push(`<line x1="${x}" y1="0" x2="${x}" y2="${height}" stroke="#ffffff" stroke-opacity="0.16" stroke-width="0.08" stroke-dasharray="0.3 0.35"/>`);
+    }
+    for (let y = 5; y < height; y += 10) {
+      lines.push(`<line x1="0" y1="${y}" x2="${width}" y2="${y}" stroke="#ffffff" stroke-opacity="0.16" stroke-width="0.08" stroke-dasharray="0.3 0.35"/>`);
+    }
+    // Primary 10x10bw sector boundaries with subtle dark backing for clear contrast over all terrain
     for (let x = 10; x < width; x += 10) {
-      lines.push(`<line x1="${x}" y1="0" x2="${x}" y2="${height}" stroke="#ffffff" stroke-opacity="0.28" stroke-width="0.12" stroke-dasharray="0.45 0.35"/>`);
+      lines.push(`<line x1="${x}" y1="0" x2="${x}" y2="${height}" stroke="#0d120a" stroke-opacity="0.42" stroke-width="0.22"/>`);
+      lines.push(`<line x1="${x}" y1="0" x2="${x}" y2="${height}" stroke="#f5f0d5" stroke-opacity="0.78" stroke-width="0.13" stroke-dasharray="0.55 0.32"/>`);
     }
     for (let y = 10; y < height; y += 10) {
-      lines.push(`<line x1="0" y1="${y}" x2="${width}" y2="${y}" stroke="#ffffff" stroke-opacity="0.28" stroke-width="0.12" stroke-dasharray="0.45 0.35"/>`);
+      lines.push(`<line x1="0" y1="${y}" x2="${width}" y2="${y}" stroke="#0d120a" stroke-opacity="0.42" stroke-width="0.22"/>`);
+      lines.push(`<line x1="0" y1="${y}" x2="${width}" y2="${y}" stroke="#f5f0d5" stroke-opacity="0.78" stroke-width="0.13" stroke-dasharray="0.55 0.32"/>`);
     }
-    // Minor 2bw tick marks on border
+    // Crisp 2bw border tick marks (longer at 5bw marks)
     for (let x = 2; x < width; x += 2) {
-      lines.push(`<line x1="${x}" y1="0" x2="${x}" y2="0.35" stroke="#ffffff" stroke-opacity="0.32" stroke-width="0.08"/>`);
-      lines.push(`<line x1="${x}" y1="${height}" x2="${x}" y2="${height - 0.35}" stroke="#ffffff" stroke-opacity="0.32" stroke-width="0.08"/>`);
+      const len = x % 10 === 0 ? 0.65 : 0.42;
+      lines.push(`<line x1="${x}" y1="0" x2="${x}" y2="${len}" stroke="#f5f0d5" stroke-opacity="0.62" stroke-width="0.1"/>`);
+      lines.push(`<line x1="${x}" y1="${height}" x2="${x}" y2="${height - len}" stroke="#f5f0d5" stroke-opacity="0.62" stroke-width="0.1"/>`);
     }
     for (let y = 2; y < height; y += 2) {
-      lines.push(`<line x1="0" y1="${y}" x2="0.35" y2="${y}" stroke="#ffffff" stroke-opacity="0.32" stroke-width="0.08"/>`);
-      lines.push(`<line x1="${width}" y1="${y}" x2="${width - 0.35}" y2="${y}" stroke="#ffffff" stroke-opacity="0.32" stroke-width="0.08"/>`);
+      const len = y % 10 === 0 ? 0.65 : 0.42;
+      lines.push(`<line x1="0" y1="${y}" x2="${len}" y2="${y}" stroke="#f5f0d5" stroke-opacity="0.62" stroke-width="0.1"/>`);
+      lines.push(`<line x1="${width}" y1="${y}" x2="${width - len}" y2="${y}" stroke="#f5f0d5" stroke-opacity="0.62" stroke-width="0.1"/>`);
     }
     const labels = [];
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
-        labels.push(`<text x="${c * 10 + 0.65}" y="${r * 10 + 1.25}" class="map-sector-tag">${colLetters[c]}${r + 1}</text>`);
+        labels.push(`<text x="${c * 10 + 0.62}" y="${r * 10 + 1.28}" class="map-sector-tag">${colLetters[c]}${r + 1}</text>`);
       }
     }
     gridSvg = `<g class="map-grid">${lines.join('')}${labels.join('')}</g>`;
@@ -1253,7 +1265,7 @@ export function renderBattlefieldSvg(bf, settings) {
     deploySvg = `
       <g class="map-deploy-zones" pointer-events="none">
         <rect x="2" y="0" width="${width - 4}" height="6" fill="#2e7ba8" fill-opacity="0.18" stroke="#6cc2f0" stroke-width="0.14" stroke-dasharray="0.5 0.3"/>
-        <text x="${width / 2}" y="1.2" text-anchor="middle" class="map-deploy-label">Defender Deployment (6bw deep · 2bw side margin)</text>
+        <text x="${width / 2}" y="5.58" text-anchor="middle" class="map-deploy-label">Defender Deployment (6bw deep · 2bw side margin)</text>
 
         <rect x="4" y="${height - 4}" width="${width - 8}" height="4" fill="#c94a38" fill-opacity="0.18" stroke="#ff8675" stroke-width="0.14" stroke-dasharray="0.5 0.3"/>
         <text x="${width / 2}" y="${height - 0.6}" text-anchor="middle" class="map-deploy-label">Attacker Deployment (4bw deep · 4bw side margin)</text>
