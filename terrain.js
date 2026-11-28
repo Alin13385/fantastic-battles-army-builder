@@ -1491,28 +1491,32 @@ export function renderTerrainModalHtml() {
       </div>
     </div>
 
-    <div class="terrain-map-frame">
-      <div class="terrain-ruler-top">${bf.width}bw &times; ${bf.height}bw Tabletop (${escapeHtml(bf.biome.name)})</div>
-      ${renderBattlefieldSvg(bf, s)}
-      <div class="terrain-legend">
-        ${['hill', 'wood', 'rough', 'water', 'settlement', 'impassable', 'linear', 'road'].map(id => {
-          const r = TERRAIN_RULE_MAP[id];
-          return `<span class="terrain-legend-item"><span class="terrain-dot" style="background:${r.color};"></span>${escapeHtml(r.name.replace(' Features', '').replace(' Terrain', ''))}</span>`;
-        }).join('')}
-      </div>
-    </div>
-
-    ${inspectorHtml}
-
-    <div class="terrain-feature-list-wrap">
-      <div class="terrain-feature-list-head">
-        <strong>Placed Features (${bf.features.length})</strong>
-        <div style="display:flex; gap:6px; flex-wrap:wrap;">
-          <button type="button" class="btn btn-sm" data-terrain-action="copy-layout">Copy Setup Text</button>
-          <button type="button" class="btn btn-sm" data-terrain-action="open-terrain-rules">Terrain Rules Ref</button>
+    <div class="terrain-workspace">
+      <div class="terrain-map-frame">
+        <div class="terrain-ruler-top">${bf.width}bw &times; ${bf.height}bw Tabletop (${escapeHtml(bf.biome.name)})</div>
+        ${renderBattlefieldSvg(bf, s)}
+        <div class="terrain-legend">
+          ${['hill', 'wood', 'rough', 'water', 'settlement', 'impassable', 'linear', 'road'].map(id => {
+            const r = TERRAIN_RULE_MAP[id];
+            return `<span class="terrain-legend-item"><span class="terrain-dot" style="background:${r.color};"></span>${escapeHtml(r.name.replace(' Features', '').replace(' Terrain', ''))}</span>`;
+          }).join('')}
         </div>
       </div>
-      <div class="terrain-feature-chips">${featureChipsHtml}</div>
+
+      <div class="terrain-side-panel">
+        ${inspectorHtml}
+
+        <div class="terrain-feature-list-wrap">
+          <div class="terrain-feature-list-head">
+            <strong>Placed Features (${bf.features.length})</strong>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button type="button" class="btn btn-sm" data-terrain-action="copy-layout">Copy Text</button>
+              <button type="button" class="btn btn-sm" data-terrain-action="open-terrain-rules">Terrain Rules</button>
+            </div>
+          </div>
+          <div class="terrain-feature-chips">${featureChipsHtml}</div>
+        </div>
+      </div>
     </div>
   `;
 }

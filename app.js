@@ -15,7 +15,7 @@ import {
   SPELL_MAP,
   INCOMPATIBILITY_MAP,
   PRESET_ARMIES
-} from './data.js?v=8';
+} from './data.js?v=9';
 
 import {
   generateId,
@@ -28,7 +28,7 @@ import {
   exportArmyText,
   encodeArmyToShareHash,
   decodeArmyFromShareHash
-} from './engine.js?v=8';
+} from './engine.js?v=9';
 
 import {
   renderBattleModeHtml,
@@ -36,23 +36,23 @@ import {
   renderPregameModalHtml,
   handlePregameAction,
   buildPrintCardsHtml
-} from './battle.js?v=8';
+} from './battle.js?v=9';
 
 import {
   UNIT_ICONS,
   UNIT_ICON_MAP,
   detectUnitIconId,
   renderUnitIconHtml
-} from './icons.js?v=8';
+} from './icons.js?v=9';
 
-import { renderComparisonHtml } from './compare.js?v=8';
+import { renderComparisonHtml } from './compare.js?v=9';
 
 import {
   renderTerrainCompendiumHtml,
   renderTerrainModalHtml,
   handleTerrainClick,
   handleTerrainChange
-} from './terrain.js?v=8';
+} from './terrain.js?v=9';
 
 const STORAGE_KEY = 'fb_army_builder_v1';
 const CUSTOM_PRESETS_KEY = 'fb_custom_presets_v1';
