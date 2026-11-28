@@ -1,8 +1,8 @@
 // Fantastic Battles — Side-by-Side Army Comparison (Matchup Balance View)
 
-import { BANNER_COLORS } from './data.js?v=7';
-import { computeArmy, formatShooting, formatDefence } from './engine.js?v=7';
-import { renderUnitIconHtml } from './icons.js?v=7';
+import { BANNER_COLORS } from './data.js?v=8';
+import { computeArmy, formatShooting, formatDefence } from './engine.js?v=8';
+import { renderUnitIconHtml } from './icons.js?v=8';
 
 function escapeHtml(str) {
   return String(str ?? '')

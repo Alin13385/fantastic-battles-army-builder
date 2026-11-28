@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=7" />
+  <link rel="stylesheet" href="styles.css?v=8" />
 </head>
 <body>
   <div class="app-shell">
@@ -74,6 +74,12 @@
               <path d="M12 3v18"/><path d="M5 7h14"/><path d="M5 7l-2 6h4l-2-6z"/><path d="M19 7l-2 6h4l-2-6z"/><path d="M8 21h8"/>
             </svg>
             Compare
+          </button>
+          <button id="btnTerrain" class="btn btn-sm" title="Battlefield Terrain Generator &amp; Rules">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 19l6-11 4.5 7 3-4.5L21 19H3z"/>
+            </svg>
+            Terrain
           </button>
           <button id="btnCompendium" class="btn btn-sm">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -336,6 +342,12 @@
               <path d="M12 3v18"/><path d="M5 7h14"/><path d="M5 7l-2 6h4l-2-6z"/><path d="M19 7l-2 6h4l-2-6z"/><path d="M8 21h8"/>
             </svg>
             <span>Compare Armies</span>
+          </button>
+          <button type="button" class="mobile-more-tile" data-more-action="terrain">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 19l6-11 4.5 7 3-4.5L21 19H3z"/>
+            </svg>
+            <span>Terrain &amp; Map Gen</span>
           </button>
           <button type="button" class="mobile-more-tile" data-more-action="rules">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -616,6 +628,7 @@
             <button class="tab-btn" data-tab="relics">Relics (14)</button>
             <button class="tab-btn" data-tab="strategies">Strategies (8)</button>
             <button class="tab-btn" data-tab="spells">Spells (10)</button>
+            <button class="tab-btn" data-tab="terrain">Terrain (9)</button>
           </div>
           <input id="compendiumSearch" class="input" type="search" placeholder="Search rules..." style="width:220px;" />
         </div>
@@ -861,12 +874,35 @@
     </div>
   </div>
 
+  <!-- ======================================================================
+       Modal: Battlefield Terrain Generator & Quick Reference
+       ====================================================================== -->
+  <div id="terrainModalOverlay" class="overlay center" aria-hidden="true">
+    <div class="modal modal-lg" role="dialog" aria-modal="true" aria-labelledby="terrainModalTitle">
+      <div class="modal-header">
+        <h2 id="terrainModalTitle">Battlefield Terrain Generator</h2>
+        <button class="btn btn-icon btn-ghost" data-close-modal="terrainModalOverlay" aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div id="terrainModalBody" class="modal-body"></div>
+      <div class="modal-footer">
+        <span style="font-size:12px; color:var(--text-muted);">
+          Follows Fantastic Battles terrain setup (1–3 features / 10×10bw square · ≥50% open ground · v1.1 pp. 19–21)
+        </span>
+        <button class="btn btn-primary" data-close-modal="terrainModalOverlay">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Native Print Area -->
   <div id="printSheet" class="print-sheet"></div>
 
   <!-- Toast Notification -->
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script type="module" src="app.js?v=7"></script>
+  <script type="module" src="app.js?v=8"></script>
 </body>
 </html>

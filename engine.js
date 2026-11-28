@@ -7,7 +7,7 @@ import {
   STRATEGY_MAP,
   SPELL_MAP,
   INCOMPATIBILITY_MAP
-} from './data.js?v=7';
+} from './data.js?v=8';
 
 export function getUnitSpells(unit) {
   if (!unit || !unit.spells || typeof unit.spells !== 'object') return [];

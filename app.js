@@ -15,7 +15,7 @@ import {
   SPELL_MAP,
   INCOMPATIBILITY_MAP,
   PRESET_ARMIES
-} from './data.js?v=7';
+} from './data.js?v=8';
 
 import {
   generateId,
@@ -28,7 +28,7 @@ import {
   exportArmyText,
   encodeArmyToShareHash,
   decodeArmyFromShareHash
-} from './engine.js?v=7';
+} from './engine.js?v=8';
 
 import {
   renderBattleModeHtml,
@@ -36,16 +36,23 @@ import {
   renderPregameModalHtml,
   handlePregameAction,
   buildPrintCardsHtml
-} from './battle.js?v=7';
+} from './battle.js?v=8';
 
 import {
   UNIT_ICONS,
   UNIT_ICON_MAP,
   detectUnitIconId,
   renderUnitIconHtml
-} from './icons.js?v=7';
+} from './icons.js?v=8';
 
-import { renderComparisonHtml } from './compare.js?v=7';
+import { renderComparisonHtml } from './compare.js?v=8';
+
+import {
+  renderTerrainCompendiumHtml,
+  renderTerrainModalHtml,
+  handleTerrainClick,
+  handleTerrainChange
+} from './terrain.js?v=8';
 
 const STORAGE_KEY = 'fb_army_builder_v1';
 const CUSTOM_PRESETS_KEY = 'fb_custom_presets_v1';
@@ -1516,6 +1523,8 @@ function renderCompendium() {
         <div class="ref-card-body">${escapeHtml(sp.description)}</div>
       </div>
     `).join('');
+  } else if (tab === 'terrain') {
+    html = renderTerrainCompendiumHtml(state.compendiumSearch);
   }
 
   box.innerHTML = html || `<div style="padding:24px; text-align:center; color:var(--text-muted);">No rules match "${escapeHtml(state.compendiumSearch)}".</div>`;
@@ -1717,6 +1726,17 @@ function openPregameModal() {
   if (!army) return;
   document.getElementById('pregameModalBody').innerHTML = renderPregameModalHtml(army);
   openOverlay('pregameModalOverlay');
+}
+
+function renderTerrainModal() {
+  const body = document.getElementById('terrainModalBody');
+  if (!body) return;
+  body.innerHTML = renderTerrainModalHtml();
+}
+
+function openTerrainModal() {
+  renderTerrainModal();
+  openOverlay('terrainModalOverlay');
 }
 
 function getComparableArmies() {
@@ -1978,6 +1998,7 @@ function bindEvents() {
   document.getElementById('btnSaveArmy').addEventListener('click', openSavedArmiesModal);
   document.getElementById('btnTemplates').addEventListener('click', openTemplatesModal);
   document.getElementById('btnCompare').addEventListener('click', openCompareModal);
+  document.getElementById('btnTerrain')?.addEventListener('click', openTerrainModal);
   document.getElementById('btnCompendium').addEventListener('click', openCompendiumModal);
   document.getElementById('btnPrint').addEventListener('click', openPrintModal);
   document.getElementById('btnShare').addEventListener('click', openShareModal);
@@ -2115,6 +2136,7 @@ function bindEvents() {
       closeOverlay('mobileMoreOverlay');
       if (action === 'save') document.getElementById('btnSaveArmy').click();
       else if (action === 'compare') document.getElementById('btnCompare').click();
+      else if (action === 'terrain') openTerrainModal();
       else if (action === 'rules') document.getElementById('btnCompendium').click();
       else if (action === 'print') document.getElementById('btnPrint').click();
       else if (action === 'share') document.getElementById('btnShare').click();
@@ -2727,6 +2749,38 @@ function bindEvents() {
     state.compendiumSearch = e.target.value;
     renderCompendium();
   });
+
+  document.getElementById('compendiumContent').addEventListener('click', e => {
+    if (e.target.closest('[data-action="open-terrain-gen-from-ref"]')) {
+      closeOverlay('compendiumModalOverlay');
+      openTerrainModal();
+    }
+  });
+
+  // Battlefield Terrain Generator Modal
+  const terrainBody = document.getElementById('terrainModalBody');
+  if (terrainBody) {
+    terrainBody.addEventListener('click', e => {
+      const res = handleTerrainClick(e.target);
+      if (res.copyText) {
+        copyToClipboard(res.copyText, 'Battlefield terrain setup copied!');
+      } else if (res.openTerrainRules) {
+        closeOverlay('terrainModalOverlay');
+        state.compendiumTab = 'terrain';
+        state.compendiumSearch = '';
+        document.getElementById('compendiumSearch').value = '';
+        openCompendiumModal();
+      } else if (res.rerender) {
+        renderTerrainModal();
+      }
+    });
+
+    terrainBody.addEventListener('change', e => {
+      if (handleTerrainChange(e.target)) {
+        renderTerrainModal();
+      }
+    });
+  }
 
   // Print Modal
   document.getElementById('printModeTable').addEventListener('click', () => {
